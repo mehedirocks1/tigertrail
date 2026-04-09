@@ -1,0 +1,97 @@
+/* Custom Utilities */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Stronger shadow for text over busy images */
+.text-shadow-strong {
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Scrollytelling Setup */
+.immersive-section {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 80vh; 
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.immersive-section-small {
+    min-height: 50vh;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth reveal animation classes */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Navigation Transition */
+#navbar {
+    transition: background-color 0.4s ease, padding 0.4s ease;
+}
+#navbar.scrolled {
+    background-color: rgba(6, 78, 59, 0.98); /* Brand Green */
+    backdrop-filter: blur(5px);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+#navbar.scrolled .nav-text {
+    color: #ffffff;
+}
+
+/* Video Container constraints */
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Marquee Animation Block */
+@keyframes scroll-marquee {
+    0% { transform: translateX(0); }
+    /* We translate by exactly half the track width plus half a gap size (12px) to loop perfectly */
+    100% { transform: translateX(calc(-50% - 12px)); } 
+}
+
+.animate-marquee {
+    animation: scroll-marquee 25s linear infinite;
+}
