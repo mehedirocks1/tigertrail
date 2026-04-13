@@ -2,10 +2,23 @@
     <x-slot:title>Tiger Run Dhaka 2026 | Save The Tiger</x-slot>
 
     @php
-        // Grab the flagship event, or fallback to the first available event
-        $featuredEvent = (isset($events) && $events->count() > 0) 
-            ? ($events->where('is_flagship', true)->first() ?? $events->first()) 
-            : null;
+        // Safe categories parser to handle both Arrays and JSON strings
+        $safeCategories = function ($event) {
+            if (!$event || empty($event->categories)) return null;
+
+            if (is_array($event->categories)) {
+                return $event->categories;
+            }
+
+            if (is_string($event->categories)) {
+                $decoded = json_decode($event->categories, true);
+                return is_array($decoded) ? $decoded : [$event->categories];
+            }
+
+            return null;
+        };
+
+        $featuredCategories = $safeCategories($featuredEvent ?? null);
     @endphp
 
     <header class="relative h-screen flex items-center justify-center overflow-hidden bg-black">
@@ -68,7 +81,7 @@
                                   <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-tiger"></span>
                                 </span>
                                 <span class="text-brand-tiger text-xs font-bold uppercase tracking-widest">
-                                    {{ $featuredEvent->is_flagship ? 'Flagship Event' : 'Next Event' }}
+                                    Flagship Event
                                 </span>
                             </div>
                             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-green/10 border border-brand-green/20">
@@ -82,7 +95,7 @@
                         </h2>
                         
                         <p class="text-gray-600 text-lg md:text-xl leading-relaxed mb-8">
-                            Highlighting the urgent need to protect the Bengal Tiger and its habitat. Join runners, conservationists, students, and nature lovers to promote wildlife conservation through sport.
+                            {{ $featuredEvent->description ?? 'Highlighting the urgent need to protect the Bengal Tiger and its habitat. Join runners, conservationists, students, and nature lovers to promote wildlife conservation through sport.' }}
                         </p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -92,8 +105,8 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Date</p>
-                                    <p class="font-bold text-lg text-brand-charcoal">{{ $featuredEvent->event_date->format('F d, Y') }}</p>
-                                    <p class="text-xs text-brand-tiger font-medium">{{ $featuredEvent->event_date->format('l - g:i A') }}</p>
+                                    <p class="font-bold text-lg text-brand-charcoal">{{ $featuredEvent->event_date?->format('F d, Y') ?? 'TBA' }}</p>
+                                    <p class="text-xs text-brand-tiger font-medium">{{ $featuredEvent->event_date?->format('l - g:i A') }}</p>
                                 </div>
                             </div>
 
@@ -115,8 +128,8 @@
                                 <div>
                                     <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Categories</p>
                                     <p class="font-bold text-lg text-brand-charcoal">
-                                        @if(!empty($featuredEvent->categories))
-                                            {!! implode(' <span class="text-brand-tiger font-normal mx-2">|</span> ', $featuredEvent->categories) !!}
+                                        @if($featuredCategories)
+                                            {!! implode(' <span class="text-brand-tiger font-normal mx-2">|</span> ', $featuredCategories) !!}
                                         @else
                                             General Category
                                         @endif
@@ -165,58 +178,56 @@
                     </div>
                 </div>
             @else
-                {{-- NO EVENT PLACEHOLDER --}}
+                {{-- NO FLAGSHIP EVENT PLACEHOLDER --}}
                 <div class="bg-white rounded-[2.5rem] p-16 shadow-xl border border-gray-100 text-center">
                     <div class="w-20 h-20 bg-brand-tiger/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg class="w-10 h-10 text-brand-tiger" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </div>
-                    <h2 class="font-display text-4xl font-bold text-brand-green mb-4">No events currently scheduled</h2>
-                    <p class="text-gray-600 text-lg max-w-xl mx-auto">We are planning our next big run for conservation! Please check back later or subscribe to our newsletter for updates.</p>
+                    <h2 class="font-display text-4xl font-bold text-brand-green mb-4">No Flagship Event Currently Scheduled</h2>
+                    <p class="text-gray-600 text-lg max-w-xl mx-auto">We are planning our next big run for conservation! Please check our other upcoming events below.</p>
                 </div>
             @endif
         </div>
     </section>
 
     {{-- OTHER EVENTS SECTION --}}
-    @if($featuredEvent)
-        @php $otherEvents = $events->where('id', '!=', $featuredEvent->id); @endphp
-        @if($otherEvents->count() > 0)
-            <section id="other-events" class="py-20 bg-white relative overflow-hidden">
-                <div class="container mx-auto px-6 relative z-10">
-                    <div class="text-center mb-12">
-                        <h4 class="text-brand-tiger font-bold uppercase tracking-[0.2em] text-sm mb-2">Explore More</h4>
-                        <h2 class="font-display text-4xl font-extrabold text-brand-green">Other Running Events</h2>
-                        <div class="w-24 h-1.5 bg-brand-tiger mx-auto mt-4 rounded-full"></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        @foreach($otherEvents as $event)
-                            <div class="group bg-brand-cream/30 rounded-3xl p-8 border border-gray-100 hover:border-brand-tiger/30 hover:bg-white hover:shadow-2xl transition-all duration-500 flex flex-col text-left">
-                                <div class="flex justify-between items-start mb-6">
-                                    <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50">
-                                        <svg class="w-8 h-8 text-brand-tiger" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    </div>
-                                    <span class="text-xs font-bold text-brand-green bg-brand-green/10 px-3 py-1 rounded-full uppercase">{{ $event->event_date->format('M Y') }}</span>
-                                </div>
-                                <h3 class="font-display text-2xl font-bold text-brand-green mb-3 group-hover:text-brand-tiger transition-colors">{{ $event->title }}</h3>
-                                <div class="space-y-3 mb-8 flex-grow">
-                                    <div class="flex items-center gap-2 text-gray-600 text-sm">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                        <span>{{ $event->venue ?? 'Dhaka' }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-gray-600 text-sm">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                        <span class="font-medium text-brand-charcoal">{{ implode(', ', $event->categories ?? []) }}</span>
-                                    </div>
-                                </div>
-                                <a href="{{ route('events.register.form') }}" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-dark transition-all transform group-hover:translate-y-[-2px]">
-                                    Register Now <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
+    @if(isset($otherEvents) && $otherEvents->count() > 0)
+        <section id="other-events" class="py-20 bg-white relative overflow-hidden">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-12">
+                    <h4 class="text-brand-tiger font-bold uppercase tracking-[0.2em] text-sm mb-2">Explore More</h4>
+                    <h2 class="font-display text-4xl font-extrabold text-brand-green">Other Running Events</h2>
+                    <div class="w-24 h-1.5 bg-brand-tiger mx-auto mt-4 rounded-full"></div>
                 </div>
-            </section>
-        @endif
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($otherEvents as $event)
+                        @php $eventCats = $safeCategories($event); @endphp
+                        <div class="group bg-brand-cream/30 rounded-3xl p-8 border border-gray-100 hover:border-brand-tiger/30 hover:bg-white hover:shadow-2xl transition-all duration-500 flex flex-col text-left">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50">
+                                    <svg class="w-8 h-8 text-brand-tiger" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-brand-green bg-brand-green/10 px-3 py-1 rounded-full uppercase">{{ $event->event_date?->format('M Y') ?? 'TBA' }}</span>
+                            </div>
+                            <h3 class="font-display text-2xl font-bold text-brand-green mb-3 group-hover:text-brand-tiger transition-colors">{{ $event->title }}</h3>
+                            <div class="space-y-3 mb-8 flex-grow">
+                                <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                                    <span>{{ $event->venue ?? 'Dhaka' }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <span class="font-medium text-brand-charcoal">{{ $eventCats ? implode(', ', $eventCats) : 'General' }}</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('events.register.form') }}" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-dark transition-all transform group-hover:translate-y-[-2px]">
+                                Register Now <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
     @endif
 
     {{-- EXPERIENCE SECTION --}}
@@ -377,7 +388,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- COUNTDOWN LOGIC ---
-            @if($featuredEvent)
+            @if($featuredEvent && $featuredEvent->registration_deadline)
                 const deadlineString = "{{ $featuredEvent->registration_deadline->toIso8601String() }}";
                 const targetDate = new Date(deadlineString).getTime();
 

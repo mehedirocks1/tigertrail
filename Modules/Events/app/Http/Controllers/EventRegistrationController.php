@@ -12,20 +12,34 @@ class EventRegistrationController extends Controller
     /**
      * Show the public event listing or landing page.
      */
-  public function index()
+public function index()
 {
-    // Fetch events that are active. 
-    // We use >= now() to ensure the deadline hasn't passed.
-    $events = Event::where('is_active', true)
-                    ->where('registration_deadline', '>=', now()) 
-                    ->orderBy('event_date', 'asc')
-                    ->get();
+    $baseQuery = Event::query()
+        ->where('is_active', true)
+        ->where('registration_deadline', '>=', now());
 
-    // DEBUG: If you still see "No Events", uncomment the line below 
-    // to see if any events exist at all regardless of status:
-    // $events = Event::all(); 
+    // Safety: ensure only ONE flagship is ever considered (even if DB is dirty)
+    $featuredEvent = (clone $baseQuery)
+        ->where('is_flagship', true)
+        ->orderByDesc('event_date') // newest flagship preferred
+        ->first();
 
-    return view('frontend.index', compact('events'));
+    // Exclude featured event explicitly to avoid duplication issues
+    $otherEventsQuery = (clone $baseQuery)
+        ->where('is_flagship', false);
+
+    if ($featuredEvent) {
+        $otherEventsQuery->where('id', '!=', $featuredEvent->id);
+    }
+
+    $otherEvents = $otherEventsQuery
+        ->orderBy('event_date', 'asc')
+        ->get();
+
+    return view('frontend.index', [
+        'featuredEvent' => $featuredEvent,
+        'otherEvents' => $otherEvents,
+    ]);
 }
     /**
      * Show the generic registration form.
