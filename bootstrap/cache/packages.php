@@ -20,6 +20,17 @@
       0 => 'BladeUI\\Icons\\BladeIconsServiceProvider',
     ),
   ),
+  'devwizardhq/laravel-textify' => 
+  array (
+    'aliases' => 
+    array (
+      'Textify' => 'DevWizard\\Textify\\Facades\\Textify',
+    ),
+    'providers' => 
+    array (
+      0 => 'DevWizard\\Textify\\TextifyServiceProvider',
+    ),
+  ),
   'filament/actions' => 
   array (
     'providers' => 

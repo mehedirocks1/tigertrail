@@ -51,7 +51,7 @@ return new class extends Migration
         $table->decimal('registration_fee', 8, 2); // The 1000 BDT fee
         $table->boolean('waiver_accepted')->default(false);
         $table->boolean('terms_accepted')->default(false);
-        
+        $table->string('transaction_id')->nullable()->unique()->after('registration_fee');
         // Payment Tracking (Because the form button says "Proceed to Payment")
         $table->string('payment_status')->default('pending'); // pending, completed, failed
 
