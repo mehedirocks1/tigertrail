@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Events\Schemas;
 
 use Filament\Schemas\Schema;
-// Layout components moved to Filament\Schemas\Components in v4
+// Layout components
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid; 
 use Filament\Forms\Components\TextInput;
@@ -12,6 +12,14 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Illuminate\Support\Str;
+
+// NEW IMPORTS for the Flagship Validation Logic
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Modules\Events\App\Models\Event;
+use Closure;
 
 class EventForm
 {
@@ -25,15 +33,82 @@ class EventForm
                             ->label('Event Visibility')
                             ->helperText('Enable to show this event on the frontend.')
                             ->default(true)
-                            ->onColor('success'),
+                            ->onColor('success')
+                            ->live() // Required to trigger the instant check
+                            ->afterStateUpdated(function ($state, Set $set, Get $get, ?Model $record) {
+                                // If they try to make it active AND it is already flagged as a flagship
+                                if ($state === true && $get('is_flagship') === true) {
+                                    $existing = Event::query()
+                                        ->where('is_flagship', true)
+                                        ->where('is_active', true)
+                                        ->when($record, fn ($q) => $q->where('id', '!=', $record->id))
+                                        ->first();
+
+                                    if ($existing) {
+                                        $set('is_active', false); // Instantly revert the toggle
+                                        Notification::make()
+                                            ->title('Action Prevented')
+                                            ->body("The event '{$existing->title}' is already the active flagship. Please deactivate it first.")
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }
+                            })
+                            ->rules([
+                                fn (Get $get, ?Model $record) => function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                    if ($value === true && $get('is_flagship') === true) {
+                                        $exists = Event::query()
+                                            ->where('is_flagship', true)
+                                            ->where('is_active', true)
+                                            ->when($record, fn ($q) => $q->where('id', '!=', $record->id))
+                                            ->exists();
+                                        if ($exists) {
+                                            $fail('Another active flagship event already exists.');
+                                        }
+                                    }
+                                },
+                            ]),
                         
                         Toggle::make('is_flagship')
                             ->label('Is Flagship Event?')
                             ->helperText('Flagship events require a description for the homepage.')
-                            ->live() 
                             ->inline(false)
                             ->default(false)
-                            ->onColor('warning'),
+                            ->onColor('warning')
+                            ->live() // Required to trigger the instant check
+                            ->afterStateUpdated(function ($state, Set $set, Get $get, ?Model $record) {
+                                // If they try to make it flagship AND it is currently set to active
+                                if ($state === true && $get('is_active') === true) {
+                                    $existing = Event::query()
+                                        ->where('is_flagship', true)
+                                        ->where('is_active', true)
+                                        ->when($record, fn ($q) => $q->where('id', '!=', $record->id))
+                                        ->first();
+
+                                    if ($existing) {
+                                        $set('is_flagship', false); // Instantly revert the toggle
+                                        Notification::make()
+                                            ->title('Action Prevented')
+                                            ->body("The event '{$existing->title}' is already the active flagship. Please unflag it first.")
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }
+                            })
+                            ->rules([
+                                fn (Get $get, ?Model $record) => function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                    if ($value === true && $get('is_active') === true) {
+                                        $exists = Event::query()
+                                            ->where('is_flagship', true)
+                                            ->where('is_active', true)
+                                            ->when($record, fn ($q) => $q->where('id', '!=', $record->id))
+                                            ->exists();
+                                        if ($exists) {
+                                            $fail('Another active flagship event already exists.');
+                                        }
+                                    }
+                                },
+                            ]),
                     ])->columns(2),
 
                 Section::make('Event Details')
@@ -103,7 +178,6 @@ class EventForm
                 Section::make('Participant Restrictions')
                     ->description('Choose which age groups are permitted to register.')
                     ->schema([
-                        // FIXED: Grid::make() now works with the correct namespace import above
                         Grid::make(3)
                             ->schema([
                                 Toggle::make('allow_infants')
