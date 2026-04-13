@@ -47,9 +47,10 @@
     43 => 'Termwind\\Laravel\\TermwindServiceProvider',
     44 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
     45 => 'pxlrbt\\FilamentExcel\\FilamentExcelServiceProvider',
-    46 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
-    47 => 'App\\Providers\\AppServiceProvider',
-    48 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    46 => 'Raziul\\Sslcommerz\\SslcommerzServiceProvider',
+    47 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
+    48 => 'App\\Providers\\AppServiceProvider',
+    49 => 'App\\Providers\\Filament\\AdminPanelProvider',
   ),
   'eager' => 
   array (
@@ -84,9 +85,10 @@
     28 => 'Termwind\\Laravel\\TermwindServiceProvider',
     29 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
     30 => 'pxlrbt\\FilamentExcel\\FilamentExcelServiceProvider',
-    31 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
-    32 => 'App\\Providers\\AppServiceProvider',
-    33 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    31 => 'Raziul\\Sslcommerz\\SslcommerzServiceProvider',
+    32 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
+    33 => 'App\\Providers\\AppServiceProvider',
+    34 => 'App\\Providers\\Filament\\AdminPanelProvider',
   ),
   'deferred' => 
   array (

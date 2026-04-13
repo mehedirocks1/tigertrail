@@ -179,6 +179,17 @@
       0 => 'pxlrbt\\FilamentExcel\\FilamentExcelServiceProvider',
     ),
   ),
+  'raziul/sslcommerz-laravel' => 
+  array (
+    'aliases' => 
+    array (
+      'Sslcommerz' => 'Raziul\\Sslcommerz\\Facades\\Sslcommerz',
+    ),
+    'providers' => 
+    array (
+      0 => 'Raziul\\Sslcommerz\\SslcommerzServiceProvider',
+    ),
+  ),
   'ryangjchandler/blade-capture-directive' => 
   array (
     'aliases' => 

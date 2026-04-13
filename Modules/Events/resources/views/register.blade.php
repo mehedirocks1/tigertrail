@@ -321,6 +321,18 @@
 
     @push('scripts')
     <script>
+        (function (window, document) {
+            var loader = function () {
+                var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+                // Use sandbox for local testing, securepay for production
+                script.src = "{{ env('APP_ENV') === 'local' ? 'https://sandbox.sslcommerz.com/embed.min.js' : 'https://seamless-epay.sslcommerz.com/embed.min.js' }}?" + Math.random().toString(36).substring(7);
+                tag.parentNode.insertBefore(script, tag);
+            };
+            window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+        })(window, document);
+    </script>
+
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
             const eventSelect = document.getElementById('event-select');
@@ -340,11 +352,9 @@
                     return;
                 }
 
-                // A. Update Fee (Fixed overwrite issue by ensuring it always syncs from data attr)
                 const fee = selectedOption.getAttribute('data-fee');
                 feeDisplay.value = fee ? fee : '0';
 
-                // B. Update Race Categories
                 const categoriesRaw = selectedOption.getAttribute('data-categories');
                 categorySelect.innerHTML = '<option value="">Select Distance</option>';
                 if (categoriesRaw && categoriesRaw !== 'null') {
@@ -360,7 +370,6 @@
                     } catch (e) { console.error(e); }
                 }
 
-                // C. Check Eligibility immediately if DOB is already filled
                 checkAgeEligibility();
             }
 
@@ -389,7 +398,6 @@
 
                 if (isDisallowed) {
                     alert("⚠️ RESTRICTION ERROR:\n\n" + message + "\n\nPlease select a different event or update your information.");
-                    // Clear event selection to prevent bypass
                     eventSelect.value = "";
                     feeDisplay.value = "0";
                     categorySelect.innerHTML = '<option value="">Select Event First</option>';
@@ -402,7 +410,6 @@
             dobInput.addEventListener('input', function(e) {
                 if (e.inputType === 'deleteContentBackward') return;
 
-                // Auto-slash formatting
                 let val = this.value.replace(/\D/g, ''); 
                 if (val.length > 4) {
                     val = val.substring(0, 2) + '/' + val.substring(2, 4) + '/' + val.substring(4, 8);
@@ -411,7 +418,6 @@
                 }
                 this.value = val;
 
-                // Calculate Age
                 if (this.value.length === 10) {
                     const parts = this.value.split('/');
                     const day = parseInt(parts[0], 10);
@@ -431,13 +437,12 @@
                     else { category = 'Under 7 (Not Eligible)'; }
                     
                     ageCategoryInput.value = category;
-                    checkAgeEligibility(); // Run restriction check
+                    checkAgeEligibility(); 
                 } else {
                     ageCategoryInput.value = '';
                 }
             });
 
-            // Run on load for validation persistence
             if(eventSelect.value) { updateFormBasedOnEvent(); }
 
             // --- 2. Image Compression Logic ---
@@ -475,9 +480,14 @@
                 };
             });
 
-            // --- 3. Final Validation Popup ---
+            // --- 3. AJAX Submission for SSL Commerz Popup ---
             const form = document.getElementById('marathon-form');
+            const submitButton = form.querySelector('button[type="submit"]');
+
             form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop standard form submission
+
+                // Basic Validation Check
                 const requiredFields = form.querySelectorAll('[required]');
                 let missingFields = [];
                 requiredFields.forEach(field => {
@@ -490,18 +500,70 @@
                         missingFields.push("Runner ID Photo");
                     }
                 });
+
                 if (missingFields.length > 0) {
-                    e.preventDefault(); 
                     alert("Please complete mandatory fields:\n• " + missingFields.join("\n• "));
+                    return;
                 }
+
+                // Change button state
+                const originalBtnText = submitButton.innerHTML;
+                submitButton.innerHTML = "Initializing Payment...";
+                submitButton.disabled = true;
+
+                // Gather form data
+                const formData = new FormData(form);
+
+                // Send AJAX request to Laravel Backend
+                fetch("{{ route('events.register.submit') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json' // Forces Laravel to return JSON errors instead of HTML pages
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Success! Data contains the secure session key from SSL Commerz
+                    if (data.status === 'success' && data.GatewayPageURL) {
+                        // Launch the popup iframe!
+                        window.location.href = data.GatewayPageURL; 
+                    } else {
+                        alert("Payment gateway error. Please try again.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    let errorMsg = "An error occurred during submission.";
+                    if (error.errors) {
+                        // Format Laravel validation errors cleanly for the alert box
+                        errorMsg = Object.values(error.errors).flat().join('\n');
+                    } else if (error.message) {
+                        errorMsg = error.message; // Catch server exceptions
+                    }
+                    alert(errorMsg);
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitButton.innerHTML = originalBtnText;
+                    submitButton.disabled = false;
+                });
             });
 
             // Navbar scroll logic
             const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) navbar.classList.add('shadow-lg');
-                else navbar.classList.remove('shadow-lg');
-            });
+            if (navbar) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) navbar.classList.add('shadow-lg');
+                    else navbar.classList.remove('shadow-lg');
+                });
+            }
         });
     </script>
     @endpush

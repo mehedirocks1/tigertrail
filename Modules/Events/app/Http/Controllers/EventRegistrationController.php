@@ -1,46 +1,50 @@
 <?php
 
 namespace Modules\Events\App\Http\Controllers;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-use Modules\Events\App\Models\Event; // Updated to include App
+use Modules\Events\App\Models\Event; 
 use Modules\Events\App\Models\Attendee;
+use Raziul\Sslcommerz\Facades\Sslcommerz;
+
 class EventRegistrationController extends Controller
 {
     /**
      * Show the public event listing or landing page.
      */
-public function index()
-{
-    $baseQuery = Event::query()
-        ->where('is_active', true)
-        ->where('registration_deadline', '>=', now());
+    public function index()
+    {
+        $baseQuery = Event::query()
+            ->where('is_active', true)
+            ->where('registration_deadline', '>=', now());
 
-    // Safety: ensure only ONE flagship is ever considered (even if DB is dirty)
-    $featuredEvent = (clone $baseQuery)
-        ->where('is_flagship', true)
-        ->orderByDesc('event_date') // newest flagship preferred
-        ->first();
+        // Safety: ensure only ONE flagship is ever considered (even if DB is dirty)
+        $featuredEvent = (clone $baseQuery)
+            ->where('is_flagship', true)
+            ->orderByDesc('event_date') // newest flagship preferred
+            ->first();
 
-    // Exclude featured event explicitly to avoid duplication issues
-    $otherEventsQuery = (clone $baseQuery)
-        ->where('is_flagship', false);
+        // Exclude featured event explicitly to avoid duplication issues
+        $otherEventsQuery = (clone $baseQuery)
+            ->where('is_flagship', false);
 
-    if ($featuredEvent) {
-        $otherEventsQuery->where('id', '!=', $featuredEvent->id);
+        if ($featuredEvent) {
+            $otherEventsQuery->where('id', '!=', $featuredEvent->id);
+        }
+
+        $otherEvents = $otherEventsQuery
+            ->orderBy('event_date', 'asc')
+            ->get();
+
+        return view('frontend.index', [
+            'featuredEvent' => $featuredEvent,
+            'otherEvents' => $otherEvents,
+        ]);
     }
 
-    $otherEvents = $otherEventsQuery
-        ->orderBy('event_date', 'asc')
-        ->get();
-
-    return view('frontend.index', [
-        'featuredEvent' => $featuredEvent,
-        'otherEvents' => $otherEvents,
-    ]);
-}
     /**
      * Show the generic registration form.
      */
@@ -55,7 +59,7 @@ public function index()
     }
 
     /**
-     * Store a newly created participant registration.
+     * Store a newly created participant registration and initiate payment.
      */
     public function store(Request $request)
     {
@@ -128,10 +132,47 @@ public function index()
         $event = Event::find($request->event_id);
         $validated['registration_fee'] = $event->base_registration_fee ?? 1000;
 
-        // 5. Create the Attendee
+        // 5. Generate a Unique Transaction ID and set status to Pending
+        $transactionId = 'TRUN_' . strtoupper(uniqid());
+        $validated['transaction_id'] = $transactionId;
+        $validated['payment_status'] = 'Pending';
+
+        // 6. Create the Attendee
         $attendee = Attendee::create($validated);
 
-        // 6. Redirect back with the success banner
-        return back()->with('success', 'Registration submitted successfully! We will contact you shortly with payment instructions.');
+        // 7. Initiate SSL Commerz Payment (setAdditionalInfo removed)
+        $response = Sslcommerz::setOrder(
+            $validated['registration_fee'],          // Amount to charge
+            $transactionId,                          // Unique transaction ID
+            $event->title . ' - ' . $request->race_category // Product Name (Event + Category)
+        )
+        ->setCustomer(
+            $request->first_name . ' ' . $request->last_name,
+            $request->email,
+            $request->phone
+        )
+        ->makePayment();
+
+        // 8. Handle AJAX Response for SSL Commerz Popup
+        if ($request->ajax() || $request->wantsJson()) {
+            if ($response->success()) {
+                return response()->json([
+                    'status' => 'success',
+                    'GatewayPageURL' => $response->gatewayPageURL()
+                ]);
+            }
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to connect to payment gateway.'
+            ], 500);
+        }
+
+        // 9. Standard Redirect (Fallback for non-JS browsers)
+        if ($response->success()) {
+            return redirect($response->gatewayPageURL());
+        }
+
+        return back()->withErrors(['error' => 'Payment gateway failed to initialize. Please try again.']);
     }
 }
