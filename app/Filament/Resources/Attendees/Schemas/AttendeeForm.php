@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Filament\Resources\Attendees\Schemas;
-
+use Modules\Events\App\Models\Attendee;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;

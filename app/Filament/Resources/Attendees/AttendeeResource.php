@@ -9,7 +9,7 @@ use App\Filament\Resources\Attendees\Pages\ViewAttendee;
 use App\Filament\Resources\Attendees\Schemas\AttendeeForm;
 use App\Filament\Resources\Attendees\Schemas\AttendeeInfolist;
 use App\Filament\Resources\Attendees\Tables\AttendeesTable;
-use Modules\Events\Models\Attendee;
+use Modules\Events\App\Models\Attendee;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
