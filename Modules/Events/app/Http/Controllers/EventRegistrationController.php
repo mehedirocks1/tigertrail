@@ -90,10 +90,16 @@ class EventRegistrationController extends Controller
         try {
             return DB::transaction(function () use ($request, $validated) {
                 
-                // 1. Fetch Event and Verify Eligibility (Server-Side)
-                $event = Event::findOrFail($request->event_id);
+                // 1. Fetch Event with Row Lock (Race Condition Prevention)
+                $event = Event::where('id', $request->event_id)->lockForUpdate()->firstOrFail();
+
+                // 2. Generate Event-Specific Serial Number
+                $latestSerial = Attendee::where('event_id', $event->id)->max('serial_number') ?? 0;
+                $validated['serial_number'] = $latestSerial + 1;
+
+                // 3. Verify Eligibility based on Event Date
                 $dob = Carbon::createFromFormat('d/m/Y', $request->date_of_birth);
-                $age = $dob->age;
+                $age = $dob->diffInYears(Carbon::parse($event->event_date));
 
                 if ($age >= 7 && $age <= 10) {
                     if (!$event->allow_infants) throw new \Exception("Infant category (7-10) is not allowed for this event.");
@@ -106,14 +112,14 @@ class EventRegistrationController extends Controller
                     $validated['age_category'] = 'Adult Runner';
                 }
 
-                // 2. Handle Image Upload
+                // 4. Handle Image Upload
                 if ($request->hasFile('photo')) {
                     $path = $request->file('photo')->store('attendee-photos', 'public');
                     $validated['photo_path'] = $path;
                 }
                 unset($validated['photo']);
 
-                // 3. Prepare Final Data
+                // 5. Prepare Final Data
                 $transactionId = 'TRUN_' . strtoupper(uniqid());
                 $validated['date_of_birth'] = $dob->format('Y-m-d'); // Standardize for DB
                 $validated['registration_fee'] = $event->base_registration_fee ?? 1000;
@@ -122,10 +128,10 @@ class EventRegistrationController extends Controller
                 $validated['waiver_accepted'] = true;
                 $validated['terms_accepted'] = true;
 
-                // 4. Record the Attendee
+                // 6. Record the Attendee (serial_number is now included in $validated)
                 $attendee = Attendee::create($validated);
 
-                // 5. Initiate SSL Commerz
+                // 7. Initiate SSL Commerz
                 $response = Sslcommerz::setOrder(
                     $validated['registration_fee'],
                     $transactionId,
@@ -144,7 +150,7 @@ class EventRegistrationController extends Controller
                     throw new \Exception("Could not initialize payment gateway. Please try again.");
                 }
 
-                // 6. Return response based on request type
+                // 8. Return response based on request type
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'status' => 'success',

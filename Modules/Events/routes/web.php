@@ -25,6 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
+    // ...
+    Route::get('/results', [EventsController::class, 'results'])->name('events.results');
+
 
 
 

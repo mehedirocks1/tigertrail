@@ -68,7 +68,7 @@ class SslcommerzController extends Controller
     private function sendRegistrationSms($attendee)
     {
         try {
-            $message = "Congratulations {$attendee->first_name}! Your payment for Tiger Trail is successful. Your Registration ID: #{$attendee->id}. See you on race day!";
+            $message = "Congratulations {$attendee->first_name}! Your payment for Tiger Trail is successful. Your Registration ID: #{$attendee->serial_number}. See you on race day!";
             
             Textify::to($attendee->phone)
                 ->message($message)

@@ -25,4 +25,20 @@ class Event extends Model
     {
         return $this->hasMany(Attendee::class);
     }
+
+
+
+
+
+/**
+     * Get the results for the event.
+     */
+    public function results()
+    {
+        return $this->hasMany(EventResult::class);
+    }
+
+
+
+
 }

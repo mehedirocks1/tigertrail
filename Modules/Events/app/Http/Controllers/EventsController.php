@@ -1,7 +1,8 @@
 <?php
 
-namespace Modules\Events\Http\Controllers;
-
+namespace Modules\Events\App\Http\Controllers;
+use Modules\Events\App\Models\Event;
+use Modules\Events\App\Models\EventResult;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -53,4 +54,48 @@ class EventsController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($id) {}
+
+
+
+
+
+public function results(Request $request)
+    {
+        // ড্রপডাউনের জন্য সব ইভেন্ট এবং ইউনিক ক্যাটাগরিগুলো আনছি
+        $events = Event::select('id', 'title')->get();
+        $categories = EventResult::select('category')->whereNotNull('category')->distinct()->pluck('category');
+
+        // রেজাল্ট কুয়েরি শুরু
+        $query = EventResult::query();
+
+        // ইভেন্ট ফিল্টার
+        if ($request->filled('event_id')) {
+            $query->where('event_id', $request->event_id);
+        }
+
+        // ক্যাটাগরি ফিল্টার
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        // নাম বা BIB নম্বর দিয়ে সার্চ
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('athlete_name', 'like', "%{$searchTerm}%")
+                  ->orWhere('bib_number', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // র‍্যাংক অনুযায়ী ছোট থেকে বড় সাজানো এবং প্যাজিনেট করা (প্রতি পেজে ১০ জন)
+        $results = $query->orderBy('rank', 'asc')->paginate(10);
+
+        return view('events::results', compact('events', 'categories', 'results'));
+    }
+
+
+
+
+
+
 }

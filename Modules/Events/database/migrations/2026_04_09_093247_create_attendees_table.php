@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('attendees', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            
+            // নতুন যোগ করা হলো: ইভেন্ট-ভিত্তিক সিরিয়াল নাম্বার
+            $table->unsignedInteger('serial_number');
 
             // 1. Personal Information
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('email'); // Consider adding ->index() if you search by email often
+            $table->string('email')->index(); // দ্রুত সার্চের জন্য ইনডেক্স করা হলো
             $table->string('phone');
             $table->date('date_of_birth');
             $table->string('age_category')->nullable(); 
@@ -34,7 +37,7 @@ return new class extends Migration
 
             // 3. Health & Emergency
             $table->string('blood_group');
-            $table->text('medical_conditions')->nullable(); // Changed to text in case of long descriptions
+            $table->text('medical_conditions')->nullable(); 
             $table->string('emergency_contact_name');
             $table->string('emergency_contact_phone');
             $table->string('emergency_contact_relation');
@@ -48,16 +51,23 @@ return new class extends Migration
 
             // 5. Final Steps (Files, Fees, & Agreements)
             $table->string('photo_path'); 
-            $table->decimal('registration_fee', 10, 2); // Increased precision to 10,2 for safety
+            $table->decimal('registration_fee', 10, 2); 
             
-            // Removed ->after() as it's not valid in Schema::create
             $table->string('transaction_id')->nullable()->unique(); 
             
-            $table->string('payment_status')->default('Pending'); // Match the 'Pending' used in your Controller
+            $table->string('payment_status')->default('Pending'); 
             $table->boolean('waiver_accepted')->default(false);
             $table->boolean('terms_accepted')->default(false);
 
             $table->timestamps();
+
+            // --- Database Constraints & Indexes ---
+            
+            // একই ইভেন্টে যেন একই সিরিয়াল দুইবার না আসে তা নিশ্চিত করতে:
+            $table->unique(['event_id', 'serial_number']);
+            
+            // Prunable (অসম্পূর্ণ পেমেন্ট ডিলিট করার টাস্ক) দ্রুত কাজ করার জন্য ইনডেক্স:
+            $table->index(['payment_status', 'created_at']);
         });
     }
 
