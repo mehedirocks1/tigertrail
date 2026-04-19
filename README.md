@@ -73,3 +73,5 @@ Registration Deadlines: "Register Now" buttons automatically disable once the re
 This project is proprietary software developed for the Prokriti O Jibon Foundation.
 
 Happy Coding! 🐅🐾
+
+php artisan db:seed --class=DummyAttendeeSeeder

@@ -2,74 +2,100 @@
 
 namespace App\Filament\Resources\BibManagement\Tables;
 
-use Filament\Tables\Table;
+use Filament\Tables\Table; // সঠিক ক্লাস
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-// ফিলামেন্ট ৫.৫ এর সঠিক নেমস্পেস
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Enums\FiltersLayout; 
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Events\App\Models\Event;
+use Modules\Events\App\Models\BibAssignment;
 
 class BibManagementTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $filters = request()->get('tableFilters');
+                $eventId = $filters['event_id']['value'] ?? null;
+
+                if (blank($eventId)) {
+                    return $query->whereRaw('1 = 0');
+                }
+
+                return $query->whereHas('bibManagement', function ($q) use ($eventId) {
+                    $q->where('event_id', $eventId);
+                });
+            })
             ->columns([
-                TextColumn::make('created_at')
-                    ->label('Generated Date')
-                    ->dateTime('d M, Y h:i A')
-                    ->sortable()
-                    ->color('gray'),
+                ImageColumn::make('photo_path')
+                    ->label('Photo')
+                    ->circular()
+                    ->disk('public') // আপনার ডিস্ক অনুযায়ী
+                    ->defaultImageUrl(url('/images/default-avatar.png')),
 
-                TextColumn::make('event.title')
-                    ->label('Event')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-
-                TextColumn::make('category')
-                    ->label('Category')
-                    ->badge()
-                    ->color('info')
-                    ->searchable(),
-
-                TextColumn::make('start_from')
-                    ->label('Start BIB')
-                    ->fontFamily('mono')
-                    ->alignCenter(),
-
-                TextColumn::make('total_generated')
-                    ->label('Assigned Count')
+                TextColumn::make('bib_number')
+                    ->label('BIB')
                     ->badge()
                     ->color('success')
-                    ->alignCenter()
-                    ->suffix(' Athletes'),
+                    ->sortable()
+                    ->searchable(),
 
-                // এন্ডিং নাম্বারটি ক্যালকুলেট করে দেখানো হচ্ছে
-                TextColumn::make('end_number')
-                    ->label('End BIB')
-                    ->fontFamily('mono')
-                    ->getStateUsing(fn ($record) => $record->start_from + ($record->total_generated > 0 ? $record->total_generated - 1 : 0))
-                    ->alignCenter(),
+                TextColumn::make('first_name')
+                    ->label('Full Name')
+                    ->formatStateUsing(fn ($record) => trim(($record->first_name ?? '') . ' ' . ($record->last_name ?? '')))
+                    ->description(fn ($record) => "T-Shirt: " . ($record->t_shirt_size ?? 'N/A'))
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('first_name', 'like', "%{$search}%")
+                                     ->orWhere('last_name', 'like', "%{$search}%");
+                    }),
+
+                TextColumn::make('phone')
+                    ->label('Mobile')
+                    ->copyable()
+                    ->searchable(),
+
+                TextColumn::make('race_category')
+                    ->label('Category')
+                    ->badge(),
+
+                ToggleColumn::make('is_kit_collected')
+                    ->label('Kit Taken')
+                    ->onColor('success')
+                    ->offColor('danger'),
+
+                TextColumn::make('collected_at')
+                    ->label('Time')
+                    ->dateTime('h:i A, d M')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc') // সর্বশেষ জেনারেশন সবার উপরে থাকবে
             ->filters([
                 SelectFilter::make('event_id')
-                    ->label('Filter by Event')
-                    ->relationship('event', 'title'),
+                    ->label('Select Event')
+                    ->options(fn () => Event::pluck('title', 'id')) 
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['value'],
+                            fn (Builder $query, $value): Builder => $query->whereHas('bibManagement', fn ($q) => $q->where('event_id', $value))
+                        );
+                    })
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('race_category')
+                    ->label('Category')
+                    ->options(fn () => BibAssignment::distinct()->pluck('race_category', 'race_category')->toArray()),
+                    
+                SelectFilter::make('is_kit_collected')
+                    ->label('Collection Status')
+                    ->options([
+                        '1' => 'Collected',
+                        '0' => 'Pending',
+                    ]),
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->emptyStateHeading('Please select an event to view the BIB list');
     }
 }
