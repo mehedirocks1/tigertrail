@@ -50,24 +50,25 @@
         }
     </style>
 </head>
-<body class="bg-brand-cream text-brand-charcoal antialiased overflow-x-hidden selection:bg-brand-tiger selection:text-white">
+<body class="bg-brand-cream text-brand-charcoal antialiased overflow-x-hidden selection:bg-brand-tiger selection:text-white flex flex-col min-h-screen">
 
     <nav id="navbar" class="fixed w-full z-50 top-0 py-6 transition-all duration-300">
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent -z-10 pointer-events-none transition-opacity duration-300" id="nav-gradient"></div>
 
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <a href="{{ url('/') }}" class="nav-text text-white font-display font-bold text-xl tracking-wider uppercase z-50 drop-shadow-md">
-                Nature<span class="text-brand-tiger">Trail</span><span class="text-[10px] block font-light normal-case opacity-90 text-gray-200">Prokriti O Jibon</span>
+            <a href="{{ url('/') }}" class="nav-text text-white font-display font-bold text-xl tracking-wider uppercase z-50 drop-shadow-md flex flex-col">
+                <span>Nature<span class="text-brand-tiger">Trail</span></span>
+                <span class="text-[10px] font-light normal-case opacity-90 text-gray-200 leading-none mt-1">Prokriti O Jibon</span>
             </a>
             
             <div class="hidden md:flex space-x-8 items-center">
                 <a href="{{ url('/') }}" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Home</a>
-                <a href="#" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Activities</a>
-                <a href="#" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Gallery</a>
-                <a href="#" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Result Archive</a>
-                <a href="#suggestions" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Contact Us</a>
+                <a href="{{ route('activities.index') }}" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Activities</a>
+                <a href="{{ route('gallery.index') }}" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Gallery</a>
+                <a href="{{ route('events.results') }}" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Result Archive</a>
+                <a href="{{ route('contact.index') }}" class="nav-text text-white hover:text-brand-tiger transition font-medium text-sm tracking-wide">Contact Us</a>
                 
-                <a href="{{ url('/events/tiger-run-2026/register') }}" class="bg-brand-tiger text-white px-8 py-2.5 rounded-full font-bold hover:bg-orange-500 transition shadow-[0_0_15px_rgba(249,115,22,0.5)] transform hover:-translate-y-0.5">Register</a>
+                <a href="{{ url('/events/register') }}" class="bg-brand-tiger text-white px-8 py-2.5 rounded-full font-bold hover:bg-orange-500 transition shadow-[0_0_15px_rgba(249,115,22,0.5)] transform hover:-translate-y-0.5">Register</a>
             </div>
 
             <button id="mobile-menu-btn" class="md:hidden text-brand-tiger z-50 focus:outline-none">
@@ -79,11 +80,11 @@
         
         <div id="mobile-menu" class="fixed inset-0 bg-brand-green/98 backdrop-blur-xl transform translate-x-full transition-transform duration-300 flex flex-col justify-center items-center space-y-8 md:hidden z-40">
             <a href="{{ url('/') }}" class="text-2xl text-white font-display font-bold mobile-link">Home</a>
-            <a href="#" class="text-2xl text-white font-display font-bold mobile-link">Activities</a>
-            <a href="#" class="text-2xl text-white font-display font-bold mobile-link">Gallery</a>
-            <a href="#" class="text-2xl text-white font-display font-bold mobile-link">Result Archive</a>
-            <a href="#suggestions" class="text-2xl text-white font-display font-bold mobile-link">Contact Us</a>
-            <a href="{{ url('/events/tiger-run-2026/register') }}" class="text-2xl text-brand-tiger font-display font-black tracking-wider mobile-link mt-4 px-10 py-4 bg-brand-tiger rounded-full shadow-[0_0_20px_rgba(249,115,22,0.5)]">Register Now</a>
+            <a href="{{ route('activities.index') }}" class="text-2xl text-white font-display font-bold mobile-link">Activities</a>
+            <a href="{{ route('gallery.index') }}" class="text-2xl text-white font-display font-bold mobile-link">Gallery</a>
+            <a href="{{ route('events.results') }}" class="text-2xl text-white font-display font-bold mobile-link">Result Archive</a>
+            <a href="{{ route('contact.index') }}" class="text-2xl text-white font-display font-bold mobile-link">Contact Us</a>
+            <a href="{{ url('/events/register') }}" class="text-2xl text-brand-tiger font-display font-black tracking-wider mobile-link mt-4 px-10 py-4 bg-brand-tiger rounded-full shadow-[0_0_20px_rgba(249,115,22,0.5)]">Register Now</a>
             
             <button id="close-menu" class="absolute top-6 right-6 text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,7 +94,9 @@
         </div>
     </nav>
 
-    {{ $slot }}
+    <main class="flex-grow">
+        {{ $slot }}
+    </main>
 
     <footer class="bg-black text-gray-400 py-12 border-t border-gray-900 mt-auto">
         <div class="container mx-auto px-6 grid md:grid-cols-4 gap-8">
@@ -107,10 +110,10 @@
             <div>
                 <h4 class="text-white font-bold uppercase tracking-widest mb-4">Quick Links</h4>
                 <ul class="space-y-2">
-                    <li><a href="#" class="hover:text-brand-tiger transition">Activities</a></li>
-                    <li><a href="#" class="hover:text-brand-tiger transition">Gallery</a></li>
+                    <li><a href="{{ route('activities.index') }}" class="hover:text-brand-tiger transition">Activities</a></li>
+                    <li><a href="{{ route('gallery.index') }}" class="hover:text-brand-tiger transition">Gallery</a></li>
                     <li><a href="#" class="hover:text-brand-tiger transition">Result Archive</a></li>
-                    <li><a href="#suggestions" class="hover:text-brand-tiger transition">Contact Us</a></li>
+                    <li><a href="{{ route('contact.index') }}" class="hover:text-brand-tiger transition">Contact Us</a></li>
                 </ul>
             </div>
             <div>

@@ -2,6 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Events\App\Http\Controllers\EventRegistrationController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\ContactMessageController;;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\HomeController;
 
 // This single route handles the data fetching AND the view
 Route::get('/', [EventRegistrationController::class, 'index'])->name('home');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/contact', [ContactMessageController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactMessageController::class, 'store'])->name('contact.store');
+Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');

@@ -233,55 +233,176 @@
     {{-- EXPERIENCE SECTION --}}
     <section id="experience" class="py-24 bg-white relative overflow-hidden">
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-green/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+        
         <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-            <div class="reveal space-y-6 text-left">
-                <h4 class="text-brand-tiger font-bold uppercase tracking-[0.3em] text-sm opacity-90">About the Initiative</h4>
-                <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-brand-green leading-tight">What Is Nature Trail?</h2>
-                <div class="space-y-4">
-                    <p class="text-gray-700 text-lg leading-relaxed"><strong>Nature Trail</strong> is a people-centered conservation platform that promotes the well-being of both humans and nature through awareness-driven activities, outdoor experiences, and community engagement.</p>
-                    <p class="text-gray-700 text-lg leading-relaxed">Rooted in Bangladesh’s rich biodiversity, Nature Trail connects individuals with the natural world while inspiring responsible actions to protect ecosystems, wildlife, and natural resources for future generations.</p>
+            <div class="reveal order-1 md:order-1 space-y-6">
+                <div>
+                    <h4 class="text-brand-tiger font-bold uppercase tracking-[0.3em] mb-3 text-sm opacity-90">
+                        About the Initiative
+                    </h4>
+                    <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-brand-green leading-tight">
+                        What Is Nature Trail?
+                    </h2>
                 </div>
+                
+                <div class="space-y-4">
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        <strong>Nature Trail</strong> is a people-centered conservation platform that promotes the well-being of both humans and nature through awareness-driven activities, outdoor experiences, and community engagement.
+                    </p>
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        Rooted in Bangladesh’s rich biodiversity, Nature Trail connects individuals with the natural world while inspiring responsible actions to protect ecosystems, wildlife, and natural resources for future generations.
+                    </p>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white transition-all duration-300">
+                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white hover:shadow-xl transition-all duration-300">
+                        <div class="h-12 w-12 bg-brand-tiger/10 rounded-lg flex items-center justify-center text-brand-tiger mb-4 group-hover:scale-110 transition-transform">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-.778.099-1.533.284-2.253" />
+                            </svg>
+                        </div>
                         <h5 class="font-bold text-brand-green text-lg mb-1">Biodiversity Focus</h5>
                         <p class="text-sm text-gray-600 leading-snug">Highlighting Bangladesh’s ecosystems and wildlife.</p>
                     </div>
-                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white transition-all duration-300">
+
+                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white hover:shadow-xl transition-all duration-300">
+                        <div class="h-12 w-12 bg-brand-tiger/10 rounded-lg flex items-center justify-center text-brand-tiger mb-4 group-hover:scale-110 transition-transform">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                            </svg>
+                        </div>
+                        <h5 class="font-bold text-brand-green text-lg mb-1">Awareness & Action</h5>
+                        <p class="text-sm text-gray-600 leading-snug">Education-driven activities that inspire real change.</p>
+                    </div>
+
+                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white hover:shadow-xl transition-all duration-300">
+                        <div class="h-12 w-12 bg-brand-tiger/10 rounded-lg flex items-center justify-center text-brand-tiger mb-4 group-hover:scale-110 transition-transform">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                            </svg>
+                        </div>
                         <h5 class="font-bold text-brand-green text-lg mb-1">Human Well-Being</h5>
                         <p class="text-sm text-gray-600 leading-snug">Promoting physical and mental health through nature.</p>
                     </div>
+
+                    <div class="group bg-brand-cream/40 p-5 rounded-2xl border border-brand-green/5 hover:border-brand-green/20 hover:bg-white hover:shadow-xl transition-all duration-300">
+                        <div class="h-12 w-12 bg-brand-tiger/10 rounded-lg flex items-center justify-center text-brand-tiger mb-4 group-hover:scale-110 transition-transform">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                            </svg>
+                        </div>
+                        <h5 class="font-bold text-brand-green text-lg mb-1">Community Engagement</h5>
+                        <p class="text-sm text-gray-600 leading-snug">Bringing people together for conservation causes.</p>
+                    </div>
                 </div>
             </div>
-            <div class="reveal relative">
+
+            <div class="reveal relative order-2 md:order-2">
                 <div class="absolute -inset-4 bg-brand-gold/15 rounded-[2rem] transform rotate-3"></div>
-                <img src="{{ asset('images/what.webp') }}" alt="Nature Trail" class="relative rounded-[2rem] shadow-2xl w-full h-[600px] object-cover border border-white/50">
+                <div class="absolute inset-0 border-2 border-brand-green/5 rounded-[2rem] transform -rotate-2"></div>
+                <img src="images/what.webp" alt="Lush green nature and conservation concept" class="relative rounded-[2rem] shadow-2xl hover:scale-[1.01] transition duration-700 w-full h-[600px] object-cover border border-white/50">
+
+                <div class="absolute -bottom-6 -right-6 md:-right-10 p-6 bg-white rounded-2xl shadow-2xl border-l-8 border-brand-tiger z-10 max-w-[240px] transform hover:-translate-y-2 transition duration-300">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-brand-tiger animate-pulse"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Our Motto</span>
+                    </div>
+                    <h5 class="font-extrabold text-brand-green text-lg mb-1 leading-tight">People • Nature • Conservation</h5>
+                    <p class="text-xs text-gray-500 font-medium italic">Building awareness for a sustainable future</p>
+                </div>
             </div>
         </div>
     </section>
 
+    
+    </section>
+
     {{-- WHY NATURE TRAIL --}}
-    <section id="why" class="py-24 bg-brand-cream relative overflow-hidden text-left">
+<section id="why" class="py-24 bg-brand-cream relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-gold/15 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+        
         <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <div class="reveal relative">
                 <div class="absolute -inset-4 bg-brand-tiger/10 rounded-[2.5rem] transform -rotate-2"></div>
+                
                 <div class="relative rounded-[2.5rem] shadow-2xl overflow-hidden border-[12px] border-white">
-                    <img src="{{ asset('images/why.webp') }}" alt="Tiger" class="w-full h-[550px] object-cover transition-transform duration-[3s] hover:scale-105">
+                    <img src="images/why.webp" alt="Majestic Tiger Close-up" class="w-full h-[550px] object-cover transition-transform duration-[3s] hover:scale-105">
+                    
+                    <div class="absolute bottom-6 left-6 right-6 p-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-l-4 border-brand-tiger">
+                        <h5 class="font-bold text-brand-tiger text-xs uppercase tracking-widest mb-1">Conservation Fact</h5>
+                        <p class="text-gray-700 text-sm leading-relaxed font-medium">
+                            Bangladesh is one of the world’s biodiversity-rich yet environmentally vulnerable countries.
+                        </p>
+                    </div>
                 </div>
             </div>
+            
             <div class="reveal space-y-8">
-                <h2 class="font-display text-4xl md:text-5xl font-extrabold text-brand-green leading-tight">Why Nature Trail?</h2>
-                <p class="text-gray-600 text-lg leading-relaxed">Bangladesh is one of the world’s biodiversity-rich yet environmentally vulnerable countries. Rapid urbanization and climate change threaten ecological balance.</p>
+                <div class="space-y-2">
+                    <h4 class="text-brand-green font-bold uppercase tracking-[0.2em] text-sm opacity-70">Our Purpose</h4>
+                    <h2 class="font-display text-4xl md:text-5xl font-extrabold text-brand-green leading-tight">Why Nature Trail?</h2>
+                </div>
+                
+                <p class="text-gray-600 text-lg leading-relaxed">
+                    Bangladesh is one of the world’s biodiversity-rich yet environmentally vulnerable countries. Rapid urbanization, habitat loss, climate change, and declining wildlife populations threaten both ecological balance and human well-being.
+                </p>
+
                 <div class="space-y-6">
-                    @foreach(['Build a stronger connection between people and nature', 'Promote physical and mental health through activities', 'Raise awareness about biodiversity conservation'] as $reason)
-                        <div class="flex items-start group">
-                            <div class="w-12 h-12 rounded-xl bg-brand-tiger flex items-center justify-center text-white shadow-lg shrink-0"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747" /></svg></div>
-                            <p class="ml-5 text-gray-700 font-bold text-lg group-hover:text-brand-green transition-colors">{{ $reason }}</p>
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-12 h-12 rounded-xl bg-brand-tiger flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                </svg>
+                            </div>
                         </div>
-                    @endforeach
+                        <div class="ml-5">
+                            <p class="text-gray-700 font-bold text-lg group-hover:text-brand-green transition-colors">Build a stronger connection between people and nature</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-12 h-12 rounded-xl bg-brand-tiger flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-gray-700 font-bold text-lg group-hover:text-brand-green transition-colors">Promote physical and mental health through nature-based activities</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-12 h-12 rounded-xl bg-brand-tiger flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-gray-700 font-bold text-lg group-hover:text-brand-green transition-colors">Raise awareness about biodiversity conservation in Bangladesh</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-12 h-12 rounded-xl bg-brand-tiger flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <p class="text-gray-700 font-bold text-lg group-hover:text-brand-green transition-colors">Encourage collective responsibility for protecting wildlife and ecosystems</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+
 
     {{-- REWARDS SECTION --}}
     <section id="rewards" class="py-24 bg-brand-cream border-t border-brand-green/10 overflow-hidden">
@@ -350,6 +471,149 @@
             </div>
         </div>
     </section>
+
+
+     {{-- Community Voices/Review Section --}}
+<section id="reviews" class="py-24 bg-brand-cream relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-tiger/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h4 class="text-brand-tiger font-bold uppercase tracking-widest mb-2 opacity-80">Community Voices</h4>
+                <h2 class="font-display text-4xl md:text-5xl font-bold text-brand-green">What Our Runners Say</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">
+                    Join thousands of nature lovers who have stepped up for the Sundarbans.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-green">
+                    <div class="flex text-brand-gold mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-gray-700 italic mb-6">"Running through Dhaka with such a powerful purpose was life-changing. The organization was top-notch, and the tiger medal is my favorite trophy!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
+                            <img src="https://i.pravatar.cc/150?u=asif" alt="User" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-brand-green">Asif Rahman</h5>
+                            <p class="text-xs text-gray-500">Marathon Runner</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-tiger">
+                    <div class="flex text-brand-gold mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-gray-700 italic mb-6">"A great initiative by Prokriti O Jibon. It’s not just a race; it’s an education. My kids loved the walkathon and learning about the Sundarbans."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
+                            <img src="https://i.pravatar.cc/150?u=farhana" alt="User" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-brand-green">Farhana Islam</h5>
+                            <p class="text-xs text-gray-500">Parent & Environmentalist</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-gold">
+                    <div class="flex text-brand-gold mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+                    </div>
+                    <p class="text-gray-700 italic mb-6">"The atmosphere at Hatirjheel was electric. Digital timing was very accurate, and the kit quality (T-shirt and cap) was better than any other local run."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
+                            <img src="https://i.pravatar.cc/150?u=tanvir" alt="User" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-brand-green">Tanvir Ahmed</h5>
+                            <p class="text-xs text-gray-500">7.5K Participant</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+  {{-- Brochure --}}
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12 max-w-5xl">
+            <div class="w-full md:w-1/2 reveal relative">
+                <div class="relative bg-gray-200 aspect-[3/4] rounded shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition duration-500 border border-gray-200">
+                    <img src="run.jpg" alt="Tiger Run Brochure Cover" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
+                         <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                            <svg class="w-8 h-8 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 reveal">
+                <h2 class="font-display text-4xl font-bold text-gray-900 mb-6 uppercase leading-tight">Read Our Previous Tiger Run Brochure</h2>
+                <p class="text-gray-600 text-lg mb-8">To know more about our previous event, download the file and read about the impact we made together.</p>
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider shadow-lg transition transform hover:-translate-y-1 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download Brochure
+                </button>
+            </div>
+        </div>
+    </section>
+
+
+{{-- Sponsors --}}
+
+ <section id="organizers" class="py-20 bg-white border-t border-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col items-center space-y-16 text-center grayscale opacity-90">
+                
+                <div class="flex flex-col items-center transform scale-100 hover:scale-105 transition duration-500 hover:grayscale-0">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] mb-6">Title Sponsor</span>
+                    <div class="flex items-center justify-center">
+                         <span class="text-6xl md:text-7xl font-extrabold text-blue-900 font-sans tracking-tighter drop-shadow-sm">Incepta</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center transform hover:scale-105 transition duration-500 hover:grayscale-0">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Powered by</span>
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-red-600 font-bold text-3xl md:text-4xl leading-none">Prokriti</span>
+                        <span class="text-brand-green font-bold text-3xl md:text-4xl leading-none">O Jibon</span>
+                    </div>
+                </div>
+
+                <div class="w-full pt-10 border-t border-gray-100">
+                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-10">Organized By</span>
+                    <div class="flex flex-wrap justify-center items-center gap-12 md:gap-20">
+                        <div class="flex items-center justify-center w-20 h-20 rounded-full border-4 border-red-600 text-red-600 font-bold text-sm transform hover:scale-110 transition hover:grayscale-0 bg-white shadow-sm">
+                            safe
+                        </div>
+                        
+                        <div class="flex flex-col items-start leading-none transform hover:scale-110 transition hover:grayscale-0">
+                            <span class="text-sm font-bold text-gray-800">Bangladesh</span>
+                            <span class="text-sm font-bold text-red-600">Adventure</span>
+                            <span class="text-sm font-bold text-gray-800">Club</span>
+                        </div>
+
+                        <div class="flex flex-col items-center transform hover:scale-110 transition hover:grayscale-0">
+                             <div class="w-16 h-16 bg-brand-green text-white rounded-lg flex items-center justify-center text-2xl font-bold shadow-sm">FD</div>
+                             <span class="text-xs font-bold text-gray-600 mt-2">Forest Dept.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
 
     {{-- SUGGESTIONS / CONTACT --}}
     <section id="suggestions" class="py-24 bg-white">
