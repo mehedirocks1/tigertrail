@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('sponsors', function (Blueprint $table) {
+    Schema::create('sponsors', function (Blueprint $table) {
     $table->id();
     $table->string('name');
+    $table->string('type'); // title, powered_by, organizer
     $table->string('logo_path')->nullable();
-    $table->string('tier'); // e.g., 'title_sponsor', 'powered_by', 'organizer'
-    $table->string('link')->nullable();
-    $table->integer('order')->default(0);
+    $table->string('website_url')->nullable();
+    $table->integer('sort_order')->default(0);
     $table->boolean('is_active')->default(true);
     $table->timestamps();
 });

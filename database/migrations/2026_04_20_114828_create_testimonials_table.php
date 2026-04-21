@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('testimonials', function (Blueprint $table) {
+  Schema::create('testimonials', function (Blueprint $table) {
     $table->id();
-    $table->string('name'); // e.g., 'Asif Rahman'
-    $table->string('title')->nullable(); // e.g., 'Marathon Runner'
+    $table->string('name');
+    $table->string('title')->nullable();
     $table->string('avatar_path')->nullable();
     $table->text('review');
-    $table->integer('rating')->default(5); // 1-5 scale
-    $table->boolean('is_approved')->default(true);
+    $table->unsignedTinyInteger('rating')->default(5); // Optimized
+    $table->boolean('is_approved')->default(true); // Set to false if public-facing
     $table->timestamps();
 });
     }

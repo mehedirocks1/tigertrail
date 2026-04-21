@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
  Schema::create('race_kits', function (Blueprint $table) {
-    $table->id();
-    $table->string('name'); // e.g., 'Event T-Shirt'
-    $table->string('subtitle')->nullable(); // e.g., 'Premium Jersey'
-    $table->string('image_path');
-    $table->integer('order')->default(0);
-    $table->boolean('is_active')->default(true);
-    $table->timestamps();
-});
+        $table->id();
+        $table->string('name');
+        $table->string('subtitle')->nullable();
+        $table->string('image_path')->nullable();
+        $table->integer('order')->default(0);
+        $table->boolean('is_active')->default(true);
+        $table->timestamps();
+    });
     }
 
     /**

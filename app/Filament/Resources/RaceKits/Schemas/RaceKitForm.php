@@ -14,16 +14,34 @@ class RaceKitForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
-                TextInput::make('subtitle'),
-                FileUpload::make('image_path')
-                    ->image()
-                    ->required(),
-                TextInput::make('order')
+                    ->label('Kit Item Name')
+                    ->placeholder('e.g., Event T-Shirt')
                     ->required()
+                    ->maxLength(255),
+
+                TextInput::make('subtitle')
+                    ->label('Short Description')
+                    ->placeholder('e.g., Premium Jersey')
+                    ->maxLength(255),
+
+                FileUpload::make('image_path')
+                    ->label('Kit Image')
+                    ->image()
+                    ->disk('public') // Required for Laragon/Windows visibility
+                    ->directory('kits')
+                    ->nullable() // Allowed null for the "UPLOAD AT INDEX" fallback
+                    ->imageEditor() // Allows cropping to keep kit images uniform
+                    ->columnSpanFull(),
+
+                TextInput::make('order')
+                    ->label('Sort Order')
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->required(),
+
                 Toggle::make('is_active')
+                    ->label('Visible on Website')
+                    ->default(true)
                     ->required(),
             ]);
     }

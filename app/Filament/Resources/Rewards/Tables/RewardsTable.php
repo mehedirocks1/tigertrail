@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Rewards\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+// New v5 Unified Namespace
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -16,32 +18,47 @@ class RewardsTable
     {
         return $table
             ->columns([
+                ImageColumn::make('image_path')
+                    ->label('Image')
+                    ->disk('public'), // Ensures thumbnails show in admin panel
+
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->label('Reward')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('description')
-                    ->searchable(),
-                ImageColumn::make('image_path'),
+                    ->label('Description')
+                    ->searchable()
+                    ->limit(50), // Keeps table clean if text is long
+
                 TextColumn::make('order')
+                    ->label('Sort')
                     ->numeric()
                     ->sortable(),
+
                 IconColumn::make('is_active')
+                    ->label('Status')
                     ->boolean(),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // Add filters here if needed
             ])
-            ->recordActions([
+            ->actions([ // Standard v5 Row Actions
                 EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([ // Standard v5 Bulk Actions
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

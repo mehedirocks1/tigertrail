@@ -21,50 +21,105 @@
         $featuredCategories = $safeCategories($featuredEvent ?? null);
     @endphp
 
-    <header class="relative h-screen flex items-center justify-center overflow-hidden bg-black">
-        <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/10 to-transparent h-[30%] pointer-events-none"></div>
-        <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-            <div class="w-full h-[60%] bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.5)_0%,_transparent_60%)]"></div>
-        </div>
-
+  <header class="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+        
         <div class="absolute inset-0 z-0" id="hero-slider">
-            <img src="{{ asset('slides/slide1.webp') }}" alt="Slide 1" class="slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-100">
-            <img src="{{ asset('slides/slide2.webp') }}" alt="Slide 2" class="slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0">
-            <img src="{{ asset('slides/slide3.webp') }}" alt="Slide 3" class="slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0">
-            <img src="{{ asset('slides/slide4.webp') }}" alt="Slide 4" class="slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0">
+            @if(isset($slides) && $slides->count() > 0)
+                @foreach($slides as $slide)
+                    {{-- WRAP EVERYTHING IN THE SLIDE CONTAINER --}}
+                    <div class="slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out {{ $loop->first ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none' }}">
+                        
+                        {{-- 1. Background Image --}}
+                        <img src="{{ asset('storage/' . $slide->image_path) }}" 
+                             alt="{{ $slide->title ?? 'Tiger Run Slide' }}" 
+                             class="absolute inset-0 w-full h-full object-cover">
+                        
+                        {{-- 2. Darkening Overlays (Moved inside so they stay above the image) --}}
+                        <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/10 to-transparent h-[30%] pointer-events-none"></div>
+                        <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                            <div class="w-full h-[60%] bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.5)_0%,_transparent_60%)]"></div>
+                        </div>
+
+                        {{-- 3. Dynamic Text Content --}}
+                        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 w-full max-w-7xl mx-auto animate-float">
+                            
+                            {{-- Event Badge (Static) --}}
+                            <div class="reveal inline-flex items-center gap-3 px-6 py-2.5 rounded-full border border-white/30 bg-black/40 backdrop-blur-md shadow-2xl mb-8 transform transition-transform cursor-default">
+                                <span class="w-2 h-2 rounded-full bg-brand-tiger animate-pulse shadow-[0_0_10px_#F97316]"></span>
+                                <span class="text-white font-bold tracking-[0.3em] uppercase text-xs md:text-sm">
+                                    {{ $featuredEvent ? $featuredEvent->title : 'Create a Flagship Event' }}
+                                </span>
+                                <span class="w-2 h-2 rounded-full bg-brand-tiger animate-pulse shadow-[0_0_10px_#F97316]"></span>
+                            </div>
+
+                            {{-- Title Styling Logic: Splits the last word to make it Orange! --}}
+                            @php
+                                $titleText = $slide->title ?? 'Save the Tiger';
+                                $titleWords = explode(' ', $titleText);
+                                $lastWord = count($titleWords) > 1 ? array_pop($titleWords) : $titleText;
+                                $firstPart = count($titleWords) > 0 && $lastWord !== $titleText ? implode(' ', $titleWords) : '';
+                            @endphp
+
+                            <h1 class="reveal font-display font-black text-6xl md:text-[6rem] lg:text-[8.5rem] text-white leading-[1] md:leading-[1.05] tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] mb-6 uppercase">
+                                
+                                {{-- White Part --}}
+                                @if($firstPart)
+                                    <span class="block text-white">{{ $firstPart }}</span>
+                                @endif
+                                
+                                {{-- Orange Gradient Part (The last word) --}}
+                                <span class="block {{ $firstPart ? 'mt-1' : '' }} relative inline-block">
+                                    <span class="relative text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-brand-tiger to-red-600 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                                        {{ $lastWord }}
+                                    </span>
+                                </span>
+                                
+                                {{-- Green Subtitle --}}
+                                @if($slide->subtitle)
+                                <span class="block mt-2 text-transparent bg-clip-text bg-gradient-to-b from-brand-green to-emerald-700 text-4xl md:text-6xl lg:text-[5.5rem] tracking-normal drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                                    {{ $slide->subtitle }}
+                                </span>
+                                @endif
+                            </h1>
+                            
+                            {{-- Description --}}
+                            @if($slide->description)
+                            <p class="reveal text-white text-lg md:text-2xl lg:text-3xl max-w-4xl mx-auto font-medium tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-4">
+                                {{ $slide->description }}
+                            </p>
+                            @endif
+
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                {{-- FALLBACK IF NO SLIDES ARE IN DATABASE --}}
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-900 via-brand-green/20 to-gray-900 sliding-bg flex flex-col items-center justify-center">
+                    
+                    <div class="px-6 py-2 rounded-full border border-white/20 bg-black/40 backdrop-blur-md mb-8">
+                        <span class="text-white/70 text-xs font-bold tracking-[0.2em] uppercase">Please upload slider images</span>
+                    </div>
+
+                    <h1 class="font-display font-black text-6xl md:text-[6rem] text-white leading-[1] uppercase text-center">
+                        <span class="block text-white">Save the</span>
+                        <span class="block mt-1 relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-brand-tiger to-red-600">
+                            Tiger
+                        </span>
+                    </h1>
+                </div>
+            @endif
         </div>
 
-        <div class="relative z-20 text-center px-4 w-full max-w-7xl mx-auto flex flex-col items-center animate-float">
-            <div class="reveal inline-flex items-center gap-3 px-6 py-2.5 rounded-full border border-white/30 bg-black/40 backdrop-blur-md shadow-2xl mb-8 transform transition-transform cursor-default">
-                <span class="w-2 h-2 rounded-full bg-brand-tiger animate-pulse shadow-[0_0_10px_#F97316]"></span>
-                <span class="text-white font-bold tracking-[0.3em] uppercase text-xs md:text-sm">
-                    {{ $featuredEvent ? $featuredEvent->title : 'Tiger Run Dhaka 2026' }}
-                </span>
-                <span class="w-2 h-2 rounded-full bg-brand-tiger animate-pulse shadow-[0_0_10px_#F97316]"></span>
-            </div>
-
-            <h1 class="reveal font-display font-black text-6xl md:text-[6rem] lg:text-[8.5rem] text-white leading-[1] md:leading-[1.05] tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] mb-6 uppercase">
-                <span class="block text-white">Save the</span>
-                <span class="block mt-1 relative inline-block">
-                    <span class="relative text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-brand-tiger to-red-600 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">Tiger</span>
-                </span>
-                <span class="block mt-2 text-transparent bg-clip-text bg-gradient-to-b from-brand-green to-emerald-700 text-4xl md:text-6xl lg:text-[5.5rem] tracking-normal drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-                    Save Sundarbans
-                </span>
-            </h1>
-            
-            <p class="reveal text-white text-lg md:text-2xl lg:text-3xl max-w-4xl mx-auto font-medium tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-4">
-                Bridging fitness, awareness, and conservation in the heart of Dhaka.
-            </p>
-        </div>
-
-        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-3">
+        {{-- Scroll Down Arrow (Static, so it stays at the bottom always) --}}
+        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center gap-3">
             <span class="text-[10px] uppercase tracking-widest text-white/80 font-bold hidden md:block drop-shadow-md">Scroll To Explore</span>
             <a href="#upcoming-event" class="w-8 h-14 rounded-full border-2 border-white/60 flex justify-center p-1.5 hover:border-brand-tiger transition-colors duration-300 group bg-black/40 backdrop-blur-sm shadow-xl">
                 <div class="w-1.5 h-3 bg-brand-tiger rounded-full animate-bounce group-hover:bg-orange-400 mt-1 shadow-[0_0_8px_#F97316]"></div>
             </a>
         </div>
     </header>
+
+
 
     {{-- UPCOMING FEATURED EVENT --}}
     <section id="upcoming-event" class="py-24 bg-brand-cream relative overflow-hidden">
@@ -230,6 +285,8 @@
         </section>
     @endif
 
+
+
     {{-- EXPERIENCE SECTION --}}
     <section id="experience" class="py-24 bg-white relative overflow-hidden">
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-green/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
@@ -315,7 +372,7 @@
     </section>
 
     
-    </section>
+   
 
     {{-- WHY NATURE TRAIL --}}
 <section id="why" class="py-24 bg-brand-cream relative overflow-hidden">
@@ -404,77 +461,195 @@
         </div>
 
 
-    {{-- REWARDS SECTION --}}
+ {{-- REWARDS SECTION --}}
     <section id="rewards" class="py-24 bg-brand-cream border-t border-brand-green/10 overflow-hidden">
         <div class="container mx-auto px-6 text-center">
             <h4 class="text-brand-tiger font-bold uppercase tracking-widest mb-2">Rewards</h4>
             <h2 class="font-display text-4xl font-bold text-brand-green mb-16">Awards & Recognition</h2>
+            
             <div class="relative w-full overflow-hidden">
-                <div class="flex gap-6 animate-marquee hover:[animation-play-state:paused] py-4">
-                    @php 
-                        $rewards = [
-                            ['img' => 'mainprize500x.jpg', 'title' => 'Prize Money', 'desc' => 'Top 3 Winners'],
-                            ['img' => 'medal500px.jpg', 'title' => 'Finisher Medal', 'desc' => 'For All Finishers'],
-                            ['img' => 'airticket500x.jpg', 'title' => 'Air Ticket', 'desc' => 'Grand Raffle Winner'],
-                            ['img' => 'certificate500x.jpg', 'title' => 'Certificate', 'desc' => 'All Participants'],
-                        ];
-                    @endphp
-                    @foreach(array_merge($rewards, $rewards) as $reward)
-                        <div class="w-72 md:w-80 bg-white rounded-3xl shadow-xl p-8 text-center border-t-4 border-brand-tiger shrink-0">
-                            <img src="{{ asset('marchant/' . $reward['img']) }}" class="w-full aspect-square object-contain mb-6 drop-shadow-lg">
-                            <h3 class="font-display text-2xl font-bold text-gray-800 mb-2">{{ $reward['title'] }}</h3>
-                            <p class="text-gray-600 text-sm">{{ $reward['desc'] }}</p>
-                        </div>
-                    @endforeach
-                </div>
+                @php
+                    // Pull active rewards if not passed from controller
+                    $activeRewards = \App\Models\Reward::active()->get();
+                    // Merge for marquee loop if we have items
+                    $displayRewards = $activeRewards->count() > 0 ? $activeRewards->concat($activeRewards) : collect();
+                @endphp
+
+                @if($displayRewards->count() > 0)
+                    <div class="flex gap-6 animate-marquee hover:[animation-play-state:paused] py-4">
+                        @foreach($displayRewards as $reward)
+                            <div class="w-72 md:w-80 bg-white rounded-3xl shadow-xl p-8 text-center border-t-4 border-brand-tiger shrink-0 flex flex-col justify-center items-center">
+                                
+                                @if($reward->image_path)
+                                    <img src="{{ asset('storage/' . $reward->image_path) }}" 
+                                         class="w-full aspect-square object-contain mb-6 drop-shadow-lg" 
+                                         alt="{{ $reward->title }}">
+                                @else
+                                    {{-- Fallback for missing image --}}
+                                    <div class="w-full aspect-square mb-6 bg-gray-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                                        <span class="text-gray-400 font-bold text-xs uppercase tracking-tighter">UPLOAD AT INDEX</span>
+                                    </div>
+                                @endif
+
+                                <h3 class="font-display text-2xl font-bold text-gray-800 mb-2">{{ $reward->title }}</h3>
+                                <p class="text-gray-600 text-sm">{{ $reward->description }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    {{-- State when no rewards are in the database at all --}}
+                    <div class="py-12 bg-white/50 rounded-3xl border-2 border-dashed border-gray-200">
+                        <p class="text-gray-400 font-medium">Rewards configuration pending...</p>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
 
-    {{-- KIT SECTION --}}
+
+    
+ {{-- KIT SECTION --}}
     <section class="py-24 bg-white overflow-hidden text-center">
         <div class="container mx-auto px-6">
             <h2 class="font-display text-4xl font-bold text-brand-green mb-12">Participant Race Kit</h2>
-            <div class="flex gap-6 overflow-hidden py-4 animate-marquee-reverse">
+            
+            <div class="relative w-full overflow-hidden">
                 @php
-                    $kits = [
-                        ['img' => 'Tshirt800px.jpg', 'name' => 'Event T-Shirt', 'sub' => 'Premium Jersey'],
-                        ['img' => 'cap800x.jpg', 'name' => 'Tiger Cap', 'sub' => 'Embroidered'],
-                        ['img' => 'mug800px.jpg', 'name' => 'Commemorative Mug', 'sub' => 'Morning Brew'],
-                        ['img' => 'bag800px.jpg', 'name' => 'Race Bag', 'sub' => 'Eco Drawstring'],
-                        ['img' => 'bottle800px.jpg', 'name' => 'Sports Bottle', 'sub' => 'Stay Hydrated'],
-                    ];
+                    $activeKits = \App\Models\RaceKit::active()->get();
+                    $displayKits = $activeKits->count() > 0 ? $activeKits->concat($activeKits) : collect();
                 @endphp
-                @foreach(array_merge($kits, $kits) as $kit)
-                    <div class="w-64 md:w-80 bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm shrink-0">
-                        <img src="{{ asset('marchant/' . $kit['img']) }}" class="w-full aspect-square object-contain mb-4">
-                        <h4 class="font-bold text-lg text-brand-green">{{ $kit['name'] }}</h4>
-                        <p class="text-sm text-gray-500">{{ $kit['sub'] }}</p>
+
+                @if($displayKits->count() > 0)
+                    <div class="flex gap-6 overflow-hidden py-4 animate-marquee-reverse hover:[animation-play-state:paused]">
+                        @foreach($displayKits as $kit)
+                            <div class="w-64 md:w-80 bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm shrink-0 flex flex-col justify-center items-center">
+                                @if($kit->image_path)
+                                    <img src="{{ asset('storage/' . $kit->image_path) }}" 
+                                         class="w-full aspect-square object-contain mb-4" 
+                                         alt="{{ $kit->name }}">
+                                @else
+                                    <div class="w-full aspect-square mb-4 bg-gray-200 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                                        <span class="text-gray-400 font-bold text-[10px] uppercase">UPLOAD AT INDEX</span>
+                                    </div>
+                                @endif
+                                
+                                <h4 class="font-bold text-lg text-brand-green">{{ $kit->name }}</h4>
+                                <p class="text-sm text-gray-500">{{ $kit->subtitle }}</p>
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
+                @else
+                    {{-- FALLBACK MESSAGE --}}
+                    <div class="py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                        <p class="text-gray-400 font-medium">Race kit details are being finalized. Stay tuned!</p>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
 
-    {{-- MEMORIES & SCOREBOARD --}}
-    <section class="py-20 bg-gray-900 text-center relative overflow-hidden">
-        <div class="absolute inset-0 opacity-30 grayscale"><img src="{{ asset('bg1.jpg') }}" class="w-full h-full object-cover"></div>
+{{-- MEMORIES SECTION --}}
+    @php
+        $memories = \App\Models\Memory::active()->get();
+    @endphp
+
+    <section class="py-24 bg-gray-900 text-center relative overflow-hidden">
+        {{-- Background overlay --}}
+        <div class="absolute inset-0 opacity-20 grayscale pointer-events-none">
+            <img src="{{ asset('bg1.jpg') }}" class="w-full h-full object-cover">
+        </div>
+
         <div class="container mx-auto px-6 relative z-10">
-            <h2 class="font-display text-5xl font-bold text-white mb-10">MEMORIES</h2>
-            <div class="flex justify-center gap-6 overflow-x-auto pb-8">
-                <div class="w-72 h-96 bg-gray-800 rounded-xl overflow-hidden shrink-0"><img src="{{ asset('g3.jpg') }}" class="w-full h-full object-cover"></div>
-                <div class="w-80 h-[28rem] bg-gray-800 rounded-xl overflow-hidden border-4 border-brand-tiger transform scale-105 shrink-0 relative">
-                    <img src="{{ asset('g1.jpg') }}" class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black text-white font-bold text-2xl uppercase">Champions</div>
+            <h2 class="font-display text-5xl font-bold text-white mb-16 tracking-tighter">MEMORIES</h2>
+            
+            {{-- Swiper Container --}}
+            <div class="swiper memory-swiper !pb-20">
+                <div class="swiper-wrapper items-center">
+                    @forelse($memories as $memory)
+                        <div class="swiper-slide transition-all duration-500">
+                            <div class="relative group aspect-[3/4] overflow-hidden rounded-2xl border-2 border-white/10 shadow-2xl transition-all duration-500 group-[.swiper-slide-active]:border-brand-tiger group-[.swiper-slide-active]:border-4">
+                                
+                                <img src="{{ asset('storage/' . $memory->image_path) }}" 
+                                     class="w-full h-full object-cover grayscale group-[.swiper-slide-active]:grayscale-0 transition-all duration-700">
+                                
+                                {{-- Gradient Overlay for Title --}}
+                                @if($memory->title)
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-[.swiper-slide-active]:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 text-left">
+                                        <p class="text-brand-tiger font-bold text-xs uppercase tracking-widest mb-1">Highlight</p>
+                                        <h3 class="text-white font-display text-2xl font-bold uppercase leading-none">{{ $memory->title }}</h3>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-gray-500 italic">Capturing memories...</p>
+                    @endforelse
                 </div>
-                <div class="w-72 h-96 bg-gray-800 rounded-xl overflow-hidden shrink-0"><img src="{{ asset('g2.jpg') }}" class="w-full h-full object-cover"></div>
+                
+                {{-- Pagination dots --}}
+                <div class="swiper-pagination !-bottom-2"></div>
             </div>
         </div>
     </section>
 
+    <style>
+        /* Optional: Hide scrollbar for cleaner look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 
-     {{-- Community Voices/Review Section --}}
-<section id="reviews" class="py-24 bg-brand-cream relative overflow-hidden">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    .memory-swiper {
+        width: 100%;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .memory-swiper .swiper-slide {
+        width: 300px; /* Base width */
+        height: auto;
+        filter: blur(2px);
+        transform: scale(0.8); /* Edge items: smallest */
+        opacity: 0.5;
+        transition: all 0.5s ease;
+    }
+
+    /* Side items: medium */
+    .memory-swiper .swiper-slide-next,
+    .memory-swiper .swiper-slide-prev {
+        transform: scale(0.9);
+        opacity: 0.8;
+        filter: blur(1px);
+        z-index: 10;
+    }
+
+    /* Middle item: Largest and clear */
+    .memory-swiper .swiper-slide-active {
+        transform: scale(1.1); /* Center item: biggest */
+        filter: blur(0);
+        opacity: 1;
+        z-index: 20;
+    }
+
+    /* Style for the pagination dots */
+    .swiper-pagination-bullet { background: white !important; opacity: 0.3; }
+    .swiper-pagination-bullet-active { background: #F97316 !important; opacity: 1; width: 24px; border-radius: 4px; }
+</style>
+
+
+
+
+   {{-- Community Voices/Review Section --}}
+    @php
+        $testimonials = \App\Models\Testimonial::approved()->latest()->get();
+        $colors = ['border-brand-green', 'border-brand-tiger', 'border-brand-gold'];
+    @endphp
+
+    <section id="reviews" class="py-24 bg-brand-cream relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-brand-tiger/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
 
         <div class="container mx-auto px-6">
@@ -487,156 +662,214 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-green">
+                @foreach($testimonials as $index => $testimonial)
+                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 {{ $colors[$index % 3] }}">
                     <div class="flex text-brand-gold mb-4">
-                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                        @for($i = 1; $i <= 5; $i++)
+                            <span>{{ $i <= $testimonial->rating ? '★' : '☆' }}</span>
+                        @endfor
                     </div>
-                    <p class="text-gray-700 italic mb-6">"Running through Dhaka with such a powerful purpose was life-changing. The organization was top-notch, and the tiger medal is my favorite trophy!"</p>
+                    
+                    <p class="text-gray-700 italic mb-6">"{{ $testimonial->review }}"</p>
+                    
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
-                            <img src="https://i.pravatar.cc/150?u=asif" alt="User" class="w-full h-full object-cover">
+                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden border border-gray-100">
+                            @if($testimonial->avatar_path)
+                                <img src="{{ asset('storage/' . $testimonial->avatar_path) }}" alt="{{ $testimonial->name }}" class="w-full h-full object-cover">
+                            @else
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($testimonial->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $testimonial->name }}" class="w-full h-full object-cover">
+                            @endif
                         </div>
                         <div>
-                            <h5 class="font-bold text-brand-green">Asif Rahman</h5>
-                            <p class="text-xs text-gray-500">Marathon Runner</p>
+                            <h5 class="font-bold text-brand-green">{{ $testimonial->name }}</h5>
+                            <p class="text-xs text-gray-500">{{ $testimonial->title }}</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-tiger">
-                    <div class="flex text-brand-gold mb-4">
-                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                    </div>
-                    <p class="text-gray-700 italic mb-6">"A great initiative by Prokriti O Jibon. It’s not just a race; it’s an education. My kids loved the walkathon and learning about the Sundarbans."</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
-                            <img src="https://i.pravatar.cc/150?u=farhana" alt="User" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h5 class="font-bold text-brand-green">Farhana Islam</h5>
-                            <p class="text-xs text-gray-500">Parent & Environmentalist</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="reveal glass-card p-8 rounded-2xl shadow-lg border-b-4 border-brand-gold">
-                    <div class="flex text-brand-gold mb-4">
-                        <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
-                    </div>
-                    <p class="text-gray-700 italic mb-6">"The atmosphere at Hatirjheel was electric. Digital timing was very accurate, and the kit quality (T-shirt and cap) was better than any other local run."</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-brand-sand overflow-hidden">
-                            <img src="https://i.pravatar.cc/150?u=tanvir" alt="User" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h5 class="font-bold text-brand-green">Tanvir Ahmed</h5>
-                            <p class="text-xs text-gray-500">7.5K Participant</p>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
+            
+            @if($testimonials->isEmpty())
+                <div class="text-center py-12">
+                    <p class="text-gray-400 italic">No reviews yet. Be the first to share your experience!</p>
+                </div>
+            @endif
         </div>
     </section>
 
 
+  {{-- Brochure Section --}}
+@php
+    $brochure = \App\Models\Brochure::where('is_active', true)->latest()->first();
+@endphp
 
-
-  {{-- Brochure --}}
-    <section class="py-24 bg-white">
-        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12 max-w-5xl">
-            <div class="w-full md:w-1/2 reveal relative">
-                <div class="relative bg-gray-200 aspect-[3/4] rounded shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition duration-500 border border-gray-200">
-                    <img src="run.jpg" alt="Tiger Run Brochure Cover" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
-                         <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                            <svg class="w-8 h-8 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="w-full md:w-1/2 reveal">
-                <h2 class="font-display text-4xl font-bold text-gray-900 mb-6 uppercase leading-tight">Read Our Previous Tiger Run Brochure</h2>
-                <p class="text-gray-600 text-lg mb-8">To know more about our previous event, download the file and read about the impact we made together.</p>
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider shadow-lg transition transform hover:-translate-y-1 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Download Brochure
-                </button>
-            </div>
-        </div>
-    </section>
-
-
-{{-- Sponsors --}}
-
- <section id="organizers" class="py-20 bg-white border-t border-gray-100">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col items-center space-y-16 text-center grayscale opacity-90">
+@if($brochure)
+<section class="py-24 bg-white">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12 max-w-5xl">
+        {{-- Image Side --}}
+        <div class="w-full md:w-1/2 reveal relative">
+            <div class="relative bg-gray-200 aspect-[3/4] rounded shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition duration-500 border border-gray-200">
+                {{-- FIX 1: Use Storage URL for images --}}
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($brochure->image_path) }}" 
+                     alt="Brochure Cover" 
+                     class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
                 
-                <div class="flex flex-col items-center transform scale-100 hover:scale-105 transition duration-500 hover:grayscale-0">
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
+                     <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                        <svg class="w-8 h-8 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Content Side --}}
+        <div class="w-full md:w-1/2 reveal">
+            <h2 class="font-display text-4xl font-bold text-gray-900 mb-6 uppercase leading-tight">
+                {{ $brochure->title }}
+            </h2>
+            <p class="text-gray-600 text-lg mb-8">
+                {{ $brochure->description }}
+            </p>
+            
+            {{-- FIX 2: Use Storage URL for PDF and ensure download attribute is clean --}}
+            <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($brochure->file_path) }}" 
+               download
+               class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider shadow-lg transition transform hover:-translate-y-1">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download Brochure
+            </a>
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- Sponsors Section --}}
+@php
+    $allSponsors = \App\Models\Sponsor::active()->get()->groupBy('type');
+    $titleSponsor = $allSponsors->get('title');
+    $poweredBy = $allSponsors->get('powered_by');
+    $organizers = $allSponsors->get('organizer');
+@endphp
+
+<section id="organizers" class="py-20 bg-white border-t border-gray-100">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col items-center space-y-16 text-center">
+            
+            {{-- TITLE SPONSOR - Height: 100px (h-24) --}}
+            @if($titleSponsor)
+                @foreach($titleSponsor as $sponsor)
+                <div class="flex flex-col items-center transition duration-500">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] mb-6">Title Sponsor</span>
                     <div class="flex items-center justify-center">
-                         <span class="text-6xl md:text-7xl font-extrabold text-blue-900 font-sans tracking-tighter drop-shadow-sm">Incepta</span>
+                        <img src="{{ asset('storage/' . $sponsor->logo_path) }}" 
+                             alt="{{ $sponsor->name }}" 
+                             class="h-24 w-auto object-contain">
                     </div>
                 </div>
+                @endforeach
+            @endif
 
-                <div class="flex flex-col items-center transform hover:scale-105 transition duration-500 hover:grayscale-0">
+            {{-- POWERED BY - Height: 64px (h-16) --}}
+            @if($poweredBy)
+                @foreach($poweredBy as $sponsor)
+                <div class="flex flex-col items-center transition duration-500">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Powered by</span>
-                    <div class="flex flex-col items-center justify-center">
-                        <span class="text-red-600 font-bold text-3xl md:text-4xl leading-none">Prokriti</span>
-                        <span class="text-brand-green font-bold text-3xl md:text-4xl leading-none">O Jibon</span>
-                    </div>
+                    <img src="{{ asset('storage/' . $sponsor->logo_path) }}" 
+                         alt="{{ $sponsor->name }}" 
+                         class="h-16 w-auto object-contain">
+                </div>
+                @endforeach
+            @endif
+
+            {{-- ORGANIZERS - Height: 48px (h-12) --}}
+            @if($organizers)
+            <div class="w-full pt-10 border-t border-gray-100">
+                <span class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-10">Organized By</span>
+                <div class="flex flex-wrap justify-center items-center gap-12 md:gap-16">
+                    @foreach($organizers as $sponsor)
+                        <div class="flex flex-col items-center transition">
+                            <img src="{{ asset('storage/' . $sponsor->logo_path) }}" 
+                                 alt="{{ $sponsor->name }}" 
+                                 class="h-12 w-auto object-contain">
+                            <span class="text-[10px] font-bold text-gray-500 mt-2 uppercase tracking-wider">{{ $sponsor->name }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+        </div>
+    </div>
+</section>
+
+  {{-- SUGGESTIONS SECTION --}}
+<section id="suggestions" class="py-24 bg-white">
+    <div class="container mx-auto px-6 max-w-4xl">
+        <div class="bg-brand-green rounded-3xl p-12 shadow-2xl relative overflow-hidden text-left">
+            <div class="absolute top-0 left-0 w-2 h-full bg-brand-tiger"></div>
+            <div class="grid md:grid-cols-5 gap-12 items-center">
+                
+                {{-- Text Content --}}
+                <div class="md:col-span-2 text-white">
+                    <h2 class="font-display text-4xl font-bold mb-4">Suggestions</h2>
+                    <p class="text-gray-300">Share your thoughts or ideas to make Tiger Trail even better!</p>
                 </div>
 
-                <div class="w-full pt-10 border-t border-gray-100">
-                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-10">Organized By</span>
-                    <div class="flex flex-wrap justify-center items-center gap-12 md:gap-20">
-                        <div class="flex items-center justify-center w-20 h-20 rounded-full border-4 border-red-600 text-red-600 font-bold text-sm transform hover:scale-110 transition hover:grayscale-0 bg-white shadow-sm">
-                            safe
+                {{-- Form Content --}}
+                <div class="md:col-span-3">
+                    {{-- Success Message --}}
+                    @if(session('success'))
+                        <div class="bg-white/20 border border-white/30 text-white p-4 rounded-lg mb-6 backdrop-blur-sm animate-pulse">
+                            {{ session('success') }}
                         </div>
+                    @endif
+
+                    <form action="{{ route('suggestion.store') }}" method="POST" class="space-y-4">
+                        @csrf
                         
-                        <div class="flex flex-col items-start leading-none transform hover:scale-110 transition hover:grayscale-0">
-                            <span class="text-sm font-bold text-gray-800">Bangladesh</span>
-                            <span class="text-sm font-bold text-red-600">Adventure</span>
-                            <span class="text-sm font-bold text-gray-800">Club</span>
+                        {{-- Name & Phone in Grid --}}
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <input type="text" name="name" value="{{ old('name') }}" placeholder="Full Name" required
+                                    class="w-full bg-white/10 border @error('name') border-red-400 @else border-white/20 @enderror rounded-lg px-4 py-3 text-white placeholder:text-gray-400 focus:outline-none focus:border-brand-tiger transition">
+                                @error('name') <p class="text-red-300 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="space-y-1">
+                                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Phone (e.g. 017...)" required
+                                    class="w-full bg-white/10 border @error('phone') border-red-400 @else border-white/20 @enderror rounded-lg px-4 py-3 text-white placeholder:text-gray-400 focus:outline-none focus:border-brand-tiger transition">
+                                @error('phone') <p class="text-red-300 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
-                        <div class="flex flex-col items-center transform hover:scale-110 transition hover:grayscale-0">
-                             <div class="w-16 h-16 bg-brand-green text-white rounded-lg flex items-center justify-center text-2xl font-bold shadow-sm">FD</div>
-                             <span class="text-xs font-bold text-gray-600 mt-2">Forest Dept.</span>
+                        {{-- Email --}}
+                        <div class="space-y-1">
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="Email Address" required
+                                class="w-full bg-white/10 border @error('email') border-red-400 @else border-white/20 @enderror rounded-lg px-4 py-3 text-white placeholder:text-gray-400 focus:outline-none focus:border-brand-tiger transition">
+                            @error('email') <p class="text-red-300 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
-                    </div>
+
+                        {{-- Message --}}
+                        <div class="space-y-1">
+                            <textarea name="message" rows="3" placeholder="Write your suggestion here..." required
+                                class="w-full bg-white/10 border @error('message') border-red-400 @else border-white/20 @enderror rounded-lg px-4 py-3 text-white placeholder:text-gray-400 focus:outline-none focus:border-brand-tiger transition">{{ old('message') }}</textarea>
+                            @error('message') <p class="text-red-300 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <button type="submit" class="w-full bg-brand-tiger text-white font-bold py-4 rounded-lg hover:bg-orange-600 transition shadow-lg transform active:scale-95 duration-200">
+                            Send Suggestion
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-
-
-
-
-
-    {{-- SUGGESTIONS / CONTACT --}}
-    <section id="suggestions" class="py-24 bg-white">
-        <div class="container mx-auto px-6 max-w-4xl">
-            <div class="bg-brand-green rounded-3xl p-12 shadow-2xl relative overflow-hidden text-left">
-                <div class="absolute top-0 left-0 w-2 h-full bg-brand-tiger"></div>
-                <div class="grid md:grid-cols-5 gap-12 items-center">
-                    <div class="md:col-span-2 text-white">
-                        <h2 class="font-display text-4xl font-bold mb-4">Get In Touch</h2>
-                        <p class="text-gray-300">Have questions? Send us a message!</p>
-                    </div>
-                    <div class="md:col-span-3">
-                        <form action="#" class="space-y-4">
-                            <input type="text" placeholder="Name" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-tiger">
-                            <input type="email" placeholder="Email" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-tiger">
-                            <textarea rows="3" placeholder="Message" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-tiger"></textarea>
-                            <button class="w-full bg-brand-tiger text-white font-bold py-4 rounded-lg hover:bg-orange-600 transition">Send Message</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     {{-- VIDEO --}}
     <section class="py-20 bg-brand-green text-white">
@@ -685,6 +918,38 @@
             }, 5000);
         });
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+    new Swiper(".memory-swiper", {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        loop: true,
+        slidesPerView: "auto", // Allows the "5-card" look
+        coverflowEffect: {
+            rotate: 0,
+            stretch: 0,
+            depth: 100,
+            modifier: 2.5, // Controls how much the side ones "shrink"
+            slideShadows: false,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        breakpoints: {
+            320: { slidesPerView: 1.5, spaceBetween: 20 },
+            768: { slidesPerView: 3, spaceBetween: 30 },
+            1024: { slidesPerView: 5, spaceBetween: 40 }
+        }
+    });
+</script>
+
+
+
+
     <style>
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .animate-marquee { display: flex; width: max-content; animation: marquee 30s linear infinite; }

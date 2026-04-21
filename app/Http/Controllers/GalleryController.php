@@ -1,25 +1,28 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Gallery;
+
+use App\Models\GalleryImage; // Switched to the correct model
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
-public function index()
+    public function index()
     {
-        // Fetch all active gallery images, ordered by sort_order or latest
-        $photos = Gallery::active()
-            ->orderBy('sort_order')
+        // Fetch all active gallery images, ordered by your Filament 'order' field
+        $images = GalleryImage::active()
+            ->orderBy('order')
             ->latest()
             ->get();
 
         // Extract unique categories dynamically for the UI filter buttons
-        $categories = Gallery::active()
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        // Added 'whereNotNull' so empty categories don't break the buttons
+        $categories = GalleryImage::active()
+            ->whereNotNull('category')
+            ->pluck('category')
+            ->unique()
+            ->values();
 
-        return view('frontend.gallery', compact('photos', 'categories'));
+        return view('frontend.gallery', compact('images', 'categories'));
     }
 }

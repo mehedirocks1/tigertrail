@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Testimonials\Schemas;
 
-use Filament\Forms\Components\TextInput;
+// --- CRITICAL IMPORTS START ---
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select; // This was likely missing!
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-
+// --- CRITICAL IMPORTS END ---
 class TestimonialForm
 {
     public static function configure(Schema $schema): Schema
@@ -14,18 +17,41 @@ class TestimonialForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+
+                TextInput::make('title')
+                    ->label('Runner Title')
+                    ->placeholder('e.g., Marathon Runner')
+                    ->maxLength(255),
+
+                Select::make('rating')
+                    ->options([
+                        5 => '5 Stars',
+                        4 => '4 Stars',
+                        3 => '3 Stars',
+                        2 => '2 Stars',
+                        1 => '1 Star',
+                    ])
+                    ->default(5)
                     ->required(),
-                TextInput::make('title'),
-                TextInput::make('avatar_path'),
+
                 Textarea::make('review')
                     ->required()
+                    ->rows(4)
                     ->columnSpanFull(),
-                TextInput::make('rating')
-                    ->required()
-                    ->numeric()
-                    ->default(5),
+
+                FileUpload::make('avatar_path')
+                    ->label('User Avatar')
+                    ->image()
+                    ->avatar() // Makes the upload UI circular
+                    ->disk('public')
+                    ->directory('testimonials')
+                    ->columnSpanFull(),
+
                 Toggle::make('is_approved')
-                    ->required(),
+                    ->label('Visible on Website')
+                    ->default(true),
             ]);
     }
 }
