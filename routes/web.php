@@ -30,3 +30,5 @@ Route::post('/suggestion', function (Illuminate\Http\Request $request) {
 
     return back()->with('success', 'Thank you! Your suggestion has been received.');
 })->name('suggestion.store');
+
+Route::get('/terms-and-conditions', [HomeController::class, 'terms'])->name('terms');

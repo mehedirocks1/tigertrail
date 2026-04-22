@@ -24,9 +24,11 @@ class BibManagementResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Bib';
 
+    // ✅ $form এর বদলে $schema ব্যবহার করা হলো
     public static function form(Schema $schema): Schema
     {
-        return BibManagementForm::configure($schema);
+        // যদি আপনার BibManagementForm ফাইলে configure() মেথড থাকে
+        return BibManagementForm::configure($schema); 
     }
 
     public static function infolist(Schema $schema): Schema
@@ -36,6 +38,7 @@ class BibManagementResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // যদি আপনার BibManagementTable ফাইলে configure() মেথড থাকে
         return BibManagementTable::configure($table);
     }
 
@@ -49,10 +52,10 @@ class BibManagementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListBibManagement::route('/'),
+            'index'  => ListBibManagement::route('/'),
             'create' => CreateBibManagement::route('/create'),
-            'view' => ViewBibManagement::route('/{record}'),
-            'edit' => EditBibManagement::route('/{record}/edit'),
+            'view'   => ViewBibManagement::route('/{record}'),
+            'edit'   => EditBibManagement::route('/{record}/edit'),
         ];
     }
 }

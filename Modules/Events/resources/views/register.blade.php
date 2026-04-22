@@ -278,10 +278,10 @@
                         </div>
 
                         <div class="space-y-6">
-                            <div>
+                            <div id="fee-container" class="hidden">
                                 <label class="input-label">Registration Fee</label>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">BDT</span>
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold"></span>
                                     <input type="text" id="fee-display" name="registration_fee" class="input-field pl-14 bg-gray-50 font-display font-extrabold text-xl text-brand-green cursor-not-allowed" readonly value="{{ old('registration_fee', '0') }}">
                                 </div>
                             </div>
@@ -338,6 +338,7 @@
             const eventSelect = document.getElementById('event-select');
             const categorySelect = document.getElementById('category-select');
             const feeDisplay = document.getElementById('fee-display');
+            const feeContainer = document.getElementById('fee-container'); // Added variable
             const dobInput = document.getElementById('dob-input');
             const ageCategoryInput = document.getElementById('age-category');
             const oldCategory = "{{ old('race_category') }}";
@@ -349,11 +350,13 @@
                 if (!selectedOption || !selectedOption.value) {
                     feeDisplay.value = '0';
                     categorySelect.innerHTML = '<option value="">Select Event First</option>';
+                    feeContainer.classList.add('hidden'); // Added hide logic
                     return;
                 }
 
                 const fee = selectedOption.getAttribute('data-fee');
                 feeDisplay.value = fee ? fee : '0';
+                feeContainer.classList.remove('hidden'); // Added show logic
 
                 const categoriesRaw = selectedOption.getAttribute('data-categories');
                 categorySelect.innerHTML = '<option value="">Select Distance</option>';
@@ -400,6 +403,7 @@
                     alert("⚠️ RESTRICTION ERROR:\n\n" + message + "\n\nPlease select a different event or update your information.");
                     eventSelect.value = "";
                     feeDisplay.value = "0";
+                    feeContainer.classList.add('hidden'); // Added logic to hide on error
                     categorySelect.innerHTML = '<option value="">Select Event First</option>';
                 }
             }

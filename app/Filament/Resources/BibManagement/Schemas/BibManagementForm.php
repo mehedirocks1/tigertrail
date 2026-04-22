@@ -2,78 +2,106 @@
 
 namespace App\Filament\Resources\BibManagement\Schemas;
 
+use Closure;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Utilities\Get; 
+
 use Modules\Events\App\Models\Event;
 use Modules\Events\App\Models\Attendee;
+use Modules\Events\App\Models\BibManagement;
 
 class BibManagementForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Generate BIB Range')
-                    ->description('Assign BIB numbers to successful payments that don\'t have one yet.')
-                    ->schema([
-                        // ১. ইভেন্ট সিলেকশন
-                        Select::make('event_id')
-                            ->label('Target Event')
-                            ->relationship('event', 'title')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->live() // ক্যাটাগরি লোড করার জন্য লাইভ রাখা হয়েছে
-                            ->columnSpan(2),
+        return $schema->components([
+            Section::make('Generate BIB Range')
+                ->description('নির্দিষ্ট ক্যাটাগরির জন্য জেনারেট করতে ক্যাটাগরি সিলেক্ট করুন। আর পুরো ইভেন্টের জন্য একসাথে জেনারেট করতে ক্যাটাগরি ফাঁকা রাখুন।')
+                ->schema([
+                    Select::make('event_id')
+                        ->label('Event')
+                        ->relationship('event', 'title')
+                        ->required()
+                        ->live()
+                        ->searchable()
+                        ->preload(),
 
-                        // ২. ক্যাটাগরি সিলেকশন (ইভেন্টের ওপর ভিত্তি করে ডাইনামিক)
-                        Select::make('category')
-                            ->label('Race Category')
-                            ->required()
-                            ->live()
-                            ->options(function (Get $get) {
-                                $eventId = $get('event_id');
-                                if (! $eventId) return [];
-                                
-                                $event = Event::find($eventId);
-                                if (! $event || empty($event->categories)) return [];
+                    Select::make('category')
+                        ->label('Category (Optional)')
+                        ->live()
+                        ->options(function (Get $get) {
+                            $event = Event::find($get('event_id'));
+                            if (!$event || empty($event->categories)) {
+                                return [];
+                            }
+                            return array_combine($event->categories, $event->categories);
+                        })
+                        ->helperText('পুরো ইভেন্টের জন্য একসাথে BIB জেনারেট করতে এটি ফাঁকা রাখুন।'),
 
-                                return array_combine($event->categories, $event->categories);
-                            })
-                            ->columnSpan(1),
-
-                        // ৩. কোথা থেকে শুরু হবে
-                        TextInput::make('start_from')
-                            ->label('Start BIB From')
-                            ->numeric()
-                            ->default(1001)
-                            ->minValue(1)
-                            ->required()
-                            ->columnSpan(1),
-
-                        // ৪. একটি হেল্পার টেক্সট বা স্ট্যাটাস দেখানোর জন্য (ঐচ্ছিক)
-                        Placeholder::make('status_info')
-                            ->label('Quick Status')
-                            ->content(function (Get $get) {
+                    TextInput::make('start_from')
+                        ->label('Start BIB')
+                        ->numeric()
+                        ->default(1001)
+                        ->required()
+                        // ✅ স্মার্ট ডুপ্লিকেট চেকিং লজিক
+                        ->rules([
+                            fn (Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
                                 $eventId = $get('event_id');
                                 $category = $get('category');
 
-                                if (!$eventId || !$category) return 'Select event & category first.';
+                                if (!$eventId) return;
 
-                                $count = Attendee::where('event_id', $eventId)
-                                    ->where('race_category', $category) // আপনার কলাম নাম অনুযায়ী race_category
-                                    ->where('payment_status', 'success')
-                                    ->whereNull('serial_number')
-                                    ->count();
+                                if ($category) {
+                                    if (BibManagement::where('event_id', $eventId)->where('category', $category)->exists()) {
+                                        $fail('এই ক্যাটাগরির জন্য আগেই BIB জেনারেট করা হয়েছে!');
+                                    }
+                                    if (BibManagement::where('event_id', $eventId)->whereNull('category')->exists()) {
+                                        $fail('এই ইভেন্টে আগেই গ্লোবাল (সব ক্যাটাগরির) BIB জেনারেট করা হয়েছে!');
+                                    }
+                                } else {
+                                    if (BibManagement::where('event_id', $eventId)->exists()) {
+                                        $fail('এই ইভেন্টে আগে থেকেই কিছু BIB জেনারেট করা আছে, তাই গ্লোবাল জেনারেশন সম্ভব নয়!');
+                                    }
+                                }
+                            },
+                        ]),
 
-                                return "Found {$count} attendees waiting for a BIB.";
-                            })
-                            ->columnSpanFull(),
-                    ])->columns(4),
-            ]);
+                    FileUpload::make('excel_file')
+                        ->label('Excel Upload')
+                        ->directory('bib-uploads')
+                        ->dehydrated(false),
+
+                    Placeholder::make('status')
+                        ->content(function (Get $get) {
+                            $eventId = $get('event_id');
+                            $category = $get('category');
+
+                            if (!$eventId) {
+                                return 'Select event to see available attendees.';
+                            }
+
+                            // ✅ নতুন কাউন্ট লজিক: সিরিয়াল নাম্বার যাই হোক, চেক করবে BIB অ্যাসাইন হয়েছে কি না
+                            $query = Attendee::query()
+                                ->where('event_id', $eventId)
+                                ->whereIn('payment_status', ['Success', 'success'])
+                                ->whereDoesntHave('bibAssignments', function ($q) use ($eventId) {
+                                    $q->where('event_id', $eventId);
+                                });
+                                
+                            if ($category) {
+                                $query->where('race_category', $category);
+                            }
+
+                            $count = $query->count();
+                            return "{$count} attendees ready for BIB assignment.";
+                        }),
+                ])
+                ->columns(2),
+        ]);
     }
 }

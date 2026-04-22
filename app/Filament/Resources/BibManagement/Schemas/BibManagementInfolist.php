@@ -3,9 +3,13 @@
 namespace App\Filament\Resources\BibManagement\Schemas;
 
 use Filament\Schemas\Schema;
+
+// ✅ লেআউট (Layout) কম্পোনেন্টগুলো এখন Schemas ফোল্ডারে
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
+
+// ✅ ডেটা এন্ট্রি (Entry) কম্পোনেন্টগুলো Infolists ফোল্ডারে
+use Filament\Infolists\Components\TextEntry;
 
 class BibManagementInfolist
 {
@@ -48,7 +52,7 @@ class BibManagementInfolist
                                     ->weight('extrabold')
                                     ->suffix(' Athletes'),
 
-                                // একটি ক্যালকুলেশন দেখানো যেতে পারে (শেষ নম্বর কত ছিল)
+                                // ক্যালকুলেশন দেখানো হচ্ছে (শেষ নম্বর কত ছিল)
                                 TextEntry::make('end_number')
                                     ->label('Ending BIB')
                                     ->fontFamily('mono')

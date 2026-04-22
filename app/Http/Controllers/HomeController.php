@@ -46,4 +46,17 @@ class HomeController extends Controller
                                 ->groupBy('type'),      // 'tier' এর বদলে 'type'
         ]);
     }
+
+
+public function terms()
+    {
+        // এটি resources/views/frontend/terms.blade.php ফাইলটিকে লোড করবে
+        return view('frontend.terms');
+    }
+
+
+
+
+
+
 }

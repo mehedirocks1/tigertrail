@@ -5,26 +5,20 @@ namespace Modules\Events\App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-// 1. Import the Prunable classes and Storage facade
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Attendee extends Model
 {
-    // 2. Add the Prunable trait here
     use HasFactory, Prunable;
 
-    /**
-     * The attributes that aren't mass assignable.
-     */
     protected $guarded = [];
 
     /**
      * Get the attributes that should be cast.
-     * (Modern Laravel 12 Syntax)
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -38,17 +32,30 @@ class Attendee extends Model
     }
 
     /**
-     * Get the event that this attendee is registered for.
+     * =========================
+     * RELATIONS
+     * =========================
      */
-    public function event()
+
+    public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
     /**
-     * Virtual Attribute: Get the attendee's full name.
-     * Usage: $attendee->full_name
+     * ✅ BIB জেনারেশনের জন্য এই রিলেশনটি অত্যন্ত গুরুত্বপূর্ণ
      */
+    public function bibAssignments(): HasMany
+    {
+        return $this->hasMany(BibAssignment::class, 'attendee_id');
+    }
+
+    /**
+     * =========================
+     * ACCESSORS
+     * =========================
+     */
+
     protected function fullName(): Attribute
     {
         return Attribute::make(
@@ -57,24 +64,34 @@ class Attendee extends Model
     }
 
     /**
-     * 3. Define the Prunable Query
-     * Tell Laravel which records are considered abandoned.
+     * =========================
+     * PRUNING LOGIC
+     * =========================
      */
+
     public function prunable(): Builder
     {
-        // Target attendees who are still "Pending" 2 hours after they started registering
-        return static::where('payment_status', 'Pending')
+        // ✅ ডাটাবেস অনুযায়ী পেমেন্ট স্ট্যাটাস চেক (Case Sensitive safe)
+        return static::whereIn('payment_status', ['Pending', 'pending'])
                      ->where('created_at', '<=', now()->subHours(2));
     }
 
-    /**
-     * 4. Clean up associated files before the database row is deleted
-     */
     protected function pruning(): void
     {
-        // Delete the uploaded runner ID photo from the public disk
         if ($this->photo_path) {
             Storage::disk('public')->delete($this->photo_path);
         }
+    }
+
+    /**
+     * =========================
+     * SCOPES
+     * =========================
+     */
+
+    public function scopeSuccessful($query)
+    {
+        // ✅ আপনার ডাটাবেসে 'Success' (S বড় হাতের) আছে, তাই iLike বা whereIn ব্যবহার করা নিরাপদ
+        return $query->whereIn('payment_status', ['Success', 'success']);
     }
 }

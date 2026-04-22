@@ -3,9 +3,9 @@
 namespace Modules\Events\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Events\App\Models\Attendee; 
 
 class BibManagement extends Model
 {
@@ -14,7 +14,7 @@ class BibManagement extends Model
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class, 'event_id');
+        return $this->belongsTo(Event::class);
     }
 
     public function assignments(): HasMany
@@ -24,60 +24,65 @@ class BibManagement extends Model
 
     protected static function booted()
     {
-        // ১. ক্রিয়েট হওয়ার আগে টোটাল কাউন্ট করে নেওয়া
-        static::creating(function ($model) {
-            $model->total_generated = static::getEligibleAttendeesQuery($model)->count();
-        });
-
-        // ২. ক্রিয়েট হওয়ার পর আসল বিআইবি এসাইনমেন্ট তৈরি করা (Snapshot logic)
         static::created(function ($model) {
-            DB::transaction(function () use ($model) {
-                $attendees = static::getEligibleAttendeesQuery($model)->get();
-                $currentBib = $model->start_from;
+            
+            /**
+             * ✅ লজিক: 
+             * ১. পেমেন্ট স্ট্যাটাস 'Success' হতে হবে (S বড় হাতের)।
+             * ২. যাদের আগে কখনও এই ইভেন্টে BIB দেওয়া হয়নি।
+             */
+            $query = Attendee::query()
+                ->where('event_id', $model->event_id)
+                ->where('payment_status', 'Success') 
+                ->whereDoesntHave('bibAssignments', function($q) use ($model) {
+                    $q->where('event_id', $model->event_id);
+                })
+                ->orderBy('created_at');
 
-                foreach ($attendees as $attendee) {
-                    BibAssignment::create([
-                        'bib_management_id' => $model->id,
-                        'attendee_id'       => $attendee->id,
-                        'bib_number'        => $currentBib++, // সিরিয়াল অনুযায়ী বিব বাড়ছে
-                        
-                        // অ্যাটেন্ডি টেবিল থেকে স্ন্যাপশট নেওয়া হচ্ছে (Permanent Data)
-                        'first_name'        => $attendee->first_name,
-                        'last_name'         => $attendee->last_name,
-                        'phone'             => $attendee->phone,
-                        'email'             => $attendee->email,
-                        'race_category'     => $attendee->race_category,
-                        't_shirt_size'      => $attendee->t_shirt_size,
-                        'blood_group'       => $attendee->blood_group,
-                        'gender'            => $attendee->gender,
-                        'photo_path'        => $attendee->photo_path,
-                    ]);
-                }
-            });
+            // যদি ক্যাটাগরি ফিল্টার থাকে
+            if (!empty($model->category)) {
+                $query->where('race_category', $model->category);
+            }
+
+            $attendees = $query->get();
+
+            if ($attendees->isEmpty()) {
+                return;
+            }
+
+            $bib = (int) $model->start_from;
+            $generatedCount = 0;
+
+            foreach ($attendees as $attendee) {
+                
+                $assignment = new BibAssignment();
+                $assignment->bib_management_id = $model->id;
+                $assignment->event_id          = $model->event_id;
+                $assignment->attendee_id       = $attendee->id;
+                $assignment->bib_number        = $bib;
+                
+                // ✅ আপনার dd() থেকে পাওয়া কি (Key) অনুযায়ী ম্যাপিং
+                $assignment->first_name        = $attendee->first_name;
+                $assignment->last_name         = $attendee->last_name;
+                $assignment->phone             = $attendee->phone;
+                $assignment->email             = $attendee->email;
+                $assignment->race_category     = $attendee->race_category;
+                $assignment->t_shirt_size      = $attendee->t_shirt_size;
+                $assignment->blood_group       = $attendee->blood_group;
+                $assignment->gender            = $attendee->gender;
+                $assignment->photo_path        = $attendee->photo_path;
+                
+                // সেভ করা হচ্ছে
+                $assignment->save(); 
+
+                $bib++; 
+                $generatedCount++;
+            }
+
+            // টোটাল কাউন্ট আপডেট (updateQuietly ব্যবহার করা হয়েছে যাতে আবার ইভেন্ট ট্রিগার না হয়)
+            $model->updateQuietly([
+                'total_generated' => $generatedCount
+            ]);
         });
-    }
-
-    /**
-     * কমন কুয়েরি লজিক: কারা বিআইবি পাওয়ার যোগ্য
-     */
-    protected static function getEligibleAttendeesQuery($model)
-    {
-        $query = Attendee::where('event_id', $model->event_id)
-            ->where('payment_status', 'Success') // পেমেন্ট সফল হতে হবে
-            ->whereDoesntHave('bibAssignment'); // যাদের আগে বিব দেওয়া হয়নি
-
-        if (!empty($model->category) && $model->category !== 'All Categories') {
-            $query->where('race_category', $model->category);
-        }
-
-        return $query;
-    }
-
-    /**
-     * একচুয়াল কাউন্ট জানার জন্য অ্যাট্রিবিউট
-     */
-    public function getGeneratedCountAttribute(): int
-    {
-        return $this->assignments()->count();
     }
 }

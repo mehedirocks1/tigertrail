@@ -6,25 +6,56 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-      Schema::create('bib_managements', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('event_id')->constrained()->cascadeOnDelete();
-        $table->string('category');
-        $table->integer('start_from'); // বিব শুরু হবে কোন নাম্বার থেকে
-        $table->integer('total_generated')->default(0); // কতজনকে বিব দেওয়া হলো
-        $table->timestamps();
+        Schema::create('bib_managements', function (Blueprint $table) {
 
+            $table->id();
+
+            // =====================
+            // RELATION
+            // =====================
+            $table->foreignId('event_id')
+                ->constrained('events')
+                ->cascadeOnDelete();
+
+            // =====================
+            // BASIC INFO
+            // =====================
+            $table->string('category')->nullable();
+
+            $table->integer('start_from');
+
+            $table->integer('total_generated')->default(0);
+
+            // =====================
+            // STATUS (IMPORTANT ADDITION)
+            // =====================
+            $table->enum('status', ['draft', 'processing', 'completed'])
+                ->default('draft');
+
+            // =====================
+            // SAFETY / CONTROL
+            // =====================
+            $table->boolean('is_locked')->default(false);
+
+            $table->timestamp('generated_at')->nullable();
+
+            // =====================
+            // META
+            // =====================
+            $table->json('meta')->nullable();
+
+            $table->timestamps();
+
+            // =====================
+            // INDEXING (PERFORMANCE)
+            // =====================
+            $table->index(['event_id', 'category']);
+            $table->index('status');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('bib_managements');
