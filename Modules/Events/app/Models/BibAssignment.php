@@ -24,10 +24,12 @@ class BibAssignment extends Model
     /**
      * ✅ Attendee এর সাথে রিলেশন (SL নম্বর দেখার জন্য জরুরি)
      */
-    public function attendee(): BelongsTo
-    {
-        return $this->belongsTo(Attendee::class, 'attendee_id');
-    }
+   // BibAssignment.php মডেলে এই ফাংশনটি থাকতে হবে
+public function attendee()
+{
+    // আপনার ডাটাবেসে ফরেন কি অনুযায়ী (সাধারণত attendee_id)
+    return $this->belongsTo(\Modules\Events\App\Models\Attendee::class, 'attendee_id');
+}
 
     /**
      * ✅ Bib Management এর সাথে রিলেশন
