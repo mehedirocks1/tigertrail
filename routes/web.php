@@ -32,3 +32,6 @@ Route::post('/suggestion', function (Illuminate\Http\Request $request) {
 })->name('suggestion.store');
 
 Route::get('/terms-and-conditions', [HomeController::class, 'terms'])->name('terms');
+Route::get('/refund-policy', [HomeController::class, 'refund'])->name('refund.policy');
+Route::get('/privacy-policy', [HomeController::class, 'privacy'])->name('privacy.policy');
+Route::get('/about-us', [HomeController::class, 'about'])->name('about.us');

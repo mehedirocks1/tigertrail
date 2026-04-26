@@ -55,6 +55,27 @@ public function terms()
     }
 
 
+public function refund()
+    {
+        // এটি resources/views/frontend/refund.blade.php ফাইলটিকে লোড করবে
+        return view('frontend.refund');
+    }
+
+
+
+public function privacy()
+{
+    return view('frontend.privacy');
+}
+
+
+public function about()
+{
+    return view('frontend.about');
+}
+
+
+
 
 
 
