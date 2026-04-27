@@ -65,18 +65,19 @@ class SslcommerzController extends Controller
     /**
      * Private helper to handle the Textify SMS logic
      */
-    private function sendRegistrationSms($attendee)
-    {
-        try {
-            $message = "Congratulations {$attendee->first_name}! Your payment for Tiger Trail is successful. Your Registration ID: #{$attendee->serial_number}. See you on race day!";
-            
-            Textify::to($attendee->phone)
-                ->message($message)
-                ->send();
+private function sendRegistrationSms($attendee)
+{
+    try {
+        $eventName = $attendee->event->title ?? 'the event';
 
-        } catch (\Exception $e) {
-            // Log the error so the user's web experience isn't broken if the SMS fails
-            Log::error("SMS Sending Failed for Attendee #{$attendee->id}: " . $e->getMessage());
-        }
+        $message = "Hi {$attendee->first_name}, payment successful for {$eventName}. ID: #{$attendee->serial_number}. See you on race day!";
+
+        Textify::to($attendee->phone)
+            ->message($message)
+            ->send();
+
+    } catch (\Exception $e) {
+        Log::error("SMS Failed #{$attendee->id}: " . $e->getMessage());
     }
+}
 }

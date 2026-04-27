@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-
+use Modules\Events\App\Models\Attendee;
 class WelcomeWidget extends Widget
 {
     protected int | string | array $columnSpan = 'full';
@@ -75,6 +75,24 @@ class WelcomeWidget extends Widget
             } catch (\Exception $e) { return null; }
         });
     }
+
+public function getTransactions()
+{
+    return \Modules\Events\App\Models\Attendee::with('event')
+        ->whereNotNull('transaction_id')
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get([
+            'id',               // Needed for relationship binding
+            'event_id',         // Needed to link to the Event model
+            'transaction_id', 
+            'first_name', 
+            'last_name', 
+            'registration_fee', 
+            'payment_status', 
+            'created_at'
+        ]); 
+}
 
     public function getUser() { return Auth::user(); }
     public function getRole() { return $this->getUser()?->role ?? 'Admin'; }

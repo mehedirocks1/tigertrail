@@ -4,29 +4,56 @@ namespace App\Filament\Resources\EventResults\Tables;
 
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-// ডাইনামিক ফিল্টারের জন্য EventResult মডেলটি ইমপোর্ট করা হলো
-use Modules\Events\App\Models\EventResult; 
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Events\App\Models\EventResult;
 
 class EventResultsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+
+            // ✅ FIXED v5 QUERY HANDLING
+            ->modifyQueryUsing(function (Builder $query, $livewire) {
+
+                $eventId = $livewire->getTableFilterState('event_id')['value'] ?? null;
+
+                if (blank($eventId)) {
+                    $query->whereRaw('1 = 0');
+                    return;
+                }
+
+                $query->where('event_id', $eventId);
+            })
+
+            ->emptyStateHeading('Select an Event')
+            ->emptyStateDescription('Please choose an event from the filter above and click "Apply" to view the results.')
+            ->emptyStateIcon('heroicon-o-trophy')
+
             ->columns([
+
+                ImageColumn::make('photo_path')
+                    ->label('Photo')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/default-avatar.png')),
+
                 TextColumn::make('rank')
                     ->label('Rank')
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        '1' => 'warning', // Gold
-                        '2' => 'gray',    // Silver
-                        '3' => 'danger',  // Bronze
+                    ->color(fn ($state) => match ((string) $state) {
+                        '1' => 'warning',
+                        '2' => 'gray',
+                        '3' => 'danger',
                         default => 'success',
                     }),
 
@@ -34,7 +61,7 @@ class EventResultsTable
                     ->label('BIB')
                     ->searchable()
                     ->fontFamily('mono')
-                    ->copyable() // ক্লিক করলেই কপি হবে
+                    ->copyable()
                     ->copyMessage('BIB Copied!'),
 
                 TextColumn::make('athlete_name')
@@ -58,36 +85,49 @@ class EventResultsTable
                     ->fontFamily('mono')
                     ->color('gray'),
 
-                // ইভেন্টের নাম ডিফল্টভাবে হাইড করা থাকবে (toggle করে দেখা যাবে)
                 TextColumn::make('event.title')
                     ->label('Event')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+
+            ->groups([
+                Group::make('event.title')->collapsible(),
+                Group::make('category')->collapsible(),
+            ])
+
+            ->defaultGroup('category')
             ->defaultSort('rank', 'asc')
+
             ->filters([
                 SelectFilter::make('event_id')
-                    ->label('Filter by Event')
-                    ->relationship('event', 'title'),
-                    
-                // ডাটাবেজ থেকে আসা ডাইনামিক ক্যাটাগরি ফিল্টার
+                    ->label('Select Event First')
+                    ->relationship('event', 'title')
+                    ->searchable()
+                    ->preload(),
+
                 SelectFilter::make('category')
                     ->label('Filter by Category')
-                    ->options(fn () => EventResult::query()
-                        ->select('category')
-                        ->distinct()
-                        ->whereNotNull('category')
-                        ->pluck('category', 'category')
-                        ->toArray()
+                    ->options(fn () =>
+                        EventResult::query()
+                            ->select('category')
+                            ->distinct()
+                            ->whereNotNull('category')
+                            ->pluck('category', 'category')
+                            ->toArray()
                     ),
             ])
+
+            ->filtersLayout(FiltersLayout::AboveContent)
+
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

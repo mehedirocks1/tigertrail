@@ -98,34 +98,53 @@
         {{ $slot }}
     </main>
 
-    <footer class="bg-black text-gray-400 py-12 border-t border-gray-900 mt-auto">
-        <div class="container mx-auto px-6 grid md:grid-cols-4 gap-8">
-            <div class="col-span-1 md:col-span-2">
-                <a href="{{ url('/') }}" class="text-white font-display font-bold text-2xl tracking-wider uppercase mb-4 block">
-                    Tiger<span class="text-brand-tiger">Run</span>
-                </a>
-                <p class="mb-4">An initiative by <span class="text-white">Prokriti O Jibon Foundation</span>.</p>
-                <p class="text-sm">Running for a greener tomorrow.</p>
-            </div>
-            <div>
-                <h4 class="text-white font-bold uppercase tracking-widest mb-4">Quick Links</h4>
-                <ul class="space-y-2">
-                    <li><a href="{{ route('activities.index') }}" class="hover:text-brand-tiger transition">Activities</a></li>
-                    <li><a href="{{ route('gallery.index') }}" class="hover:text-brand-tiger transition">Gallery</a></li>
-                    <li><a href="#" class="hover:text-brand-tiger transition">Result Archive</a></li>
-                    <li><a href="{{ route('contact.index') }}" class="hover:text-brand-tiger transition">Contact Us</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold uppercase tracking-widest mb-4">Contact</h4>
-                <p class="mb-2">info@naturetrailpojf.org</p>
-                <p class="mb-4">+880 1234 567 890</p>
-            </div>
+<footer class="bg-black text-gray-400 py-6 border-t border-gray-900">
+    <div class="container mx-auto px-4 grid md:grid-cols-4 gap-6">
+        <div class="md:col-span-2">
+            <a href="{{ url('/') }}" class="text-white font-display font-bold text-xl uppercase mb-2 block">
+                Tiger<span class="text-brand-tiger">Run</span>
+            </a>
+            <p class="mb-2">An initiative by <span class="text-white">Prokriti O Jibon Foundation</span>.</p>
+            <p class="text-sm">Running for a greener tomorrow.</p>
         </div>
-        <div class="container mx-auto px-6 mt-12 pt-8 border-t border-gray-900 text-center text-sm">
-            &copy; 2026 Tiger Run Dhaka. All rights reserved.
+
+        <div>
+            <h4 class="text-white font-bold uppercase text-sm mb-2">Quick Links</h4>
+           <ul class="space-y-1">
+        <li>
+            <a href="{{ route('terms') }}" class="hover:text-brand-tiger">Terms & Conditions</a>
+        </li>
+        <li>
+            <a href="{{ route('refund.policy') }}" class="hover:text-brand-tiger">Refund Policy</a>
+        </li>
+        <li>
+            <a href="{{ route('privacy.policy') }}" class="hover:text-brand-tiger">Privacy Policy</a>
+        </li>
+        <li>
+            <a href="{{ route('about.us') }}" class="hover:text-brand-tiger">About Us</a>
+        </li>
+    </ul>
         </div>
-    </footer>
+
+        <div>
+            <h4 class="text-white font-bold uppercase text-sm mb-2">Contact</h4>
+            <p>info@naturetrailpojf.org</p>
+            <p>+880 1234 567 890</p>
+        </div>
+    </div>
+
+    <!-- SSL -->
+    <div class="px-4 mt-6">
+        <a target="_blank" href="https://www.sslcommerz.com/" class="block max-w-xl mx-auto">
+            <img class="w-full h-auto object-contain" src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png" alt="SSLCommerz" />
+        </a>
+    </div>
+
+    <!-- Bottom -->
+    <div class="container mx-auto px-4 mt-4 pt-4 border-t border-gray-900 text-center text-xs">
+        &copy; 2026 Tiger Run Dhaka. All rights reserved.
+    </div>
+</footer>
 
     <script src="{{ asset('main.js') }}" defer></script>
     

@@ -36,12 +36,12 @@ class Attendee extends Model
      * RELATIONS
      * =========================
      */
-
+/*
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
-
+*/
     /**
      * ✅ BIB জেনারেশনের জন্য এই রিলেশনটি অত্যন্ত গুরুত্বপূর্ণ
      */
@@ -94,4 +94,16 @@ class Attendee extends Model
         // ✅ আপনার ডাটাবেসে 'Success' (S বড় হাতের) আছে, তাই iLike বা whereIn ব্যবহার করা নিরাপদ
         return $query->whereIn('payment_status', ['Success', 'success']);
     }
+
+
+
+
+
+public function event()
+{
+    return $this->belongsTo(Event::class, 'event_id');
+}
+
+
+
 }

@@ -3,6 +3,8 @@
     $smsBalance = $this->getSmsBalance();
     $sysInfo = $this->getSystemInfo();
     $stats = $this->getStats();
+    // Fetching transactions using your Attendee model logic
+    $transactions = $this->getTransactions(); 
 @endphp
 
 <div style="grid-column: 1 / -1; width: 100%; margin-bottom: 2rem;">
@@ -71,6 +73,66 @@
                     <p style="margin: 0; font-size: 14px; font-weight: 800; color: {{ $label == 'Database' ? '#4ade80' : 'white' }}">{{ $value }}</p>
                 </div>
             @endforeach
+        </div>
+    </div>
+
+    <div style="margin-top: 24px; background: #1e1b4b; border-radius: 1.5rem; padding: 30px; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: ui-sans-serif, system-ui;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 22px; font-weight: 900;">Recent Transactions</h3>
+            
+            <div style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                ⚠️ SANDBOX MODE
+            </div>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); opacity: 0.6; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                        <th style="padding: 16px 10px; font-weight: 800;">Tran ID</th>
+                        <th style="padding: 16px 10px; font-weight: 800;">Attendee</th>
+                        <th style="padding: 16px 10px; font-weight: 800;">Date</th>
+                        <th style="padding: 16px 10px; font-weight: 800;">Event</th>
+                        <th style="padding: 16px 10px; font-weight: 800;">Fee</th>
+                        <th style="padding: 16px 10px; font-weight: 800;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($transactions as $trx)
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                            <td style="padding: 18px 10px; font-family: monospace; font-size: 13px; font-weight: bold; color: #c7d2fe;">
+                                {{ $trx->transaction_id ?? 'N/A' }}
+                            </td>
+                            <td style="padding: 18px 10px; font-weight: 600;">
+                                {{ $trx->first_name }} {{ $trx->last_name }}
+                            </td>
+                            <td style="padding: 18px 10px; opacity: 0.8; font-size: 13px;">
+                                {{ $trx->created_at->format('d M Y, h:i A') }}
+                            </td>
+                            <td style="padding: 18px 10px; font-weight: 600; color: #a5b4fc; font-size: 13px;">
+                                {{ $trx->event->title ?? 'Event #'.$trx->event_id }}
+                            </td>
+                            <td style="padding: 18px 10px; font-weight: 900; font-size: 15px;">
+                                ৳ {{ number_format($trx->registration_fee, 2) }}
+                            </td>
+                            <td style="padding: 18px 10px;">
+                                <span style="padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 900; letter-spacing: 0.5px;
+                                    @if(strtoupper($trx->payment_status) === 'SUCCESS' || strtoupper($trx->payment_status) === 'VALIDATED') background: rgba(52, 211, 153, 0.15); color: #34d399;
+                                    @elseif(strtoupper($trx->payment_status) === 'FAILED') background: rgba(239, 68, 68, 0.15); color: #f87171;
+                                    @else background: rgba(251, 191, 36, 0.15); color: #fbbf24; @endif">
+                                    {{ strtoupper($trx->payment_status) }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="padding: 40px; text-align: center; opacity: 0.5; font-weight: 600;">
+                                No transactions found yet.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
